@@ -15,7 +15,7 @@ const userSchema = new mongoose.Schema({
     type: String,
     required: true,
   },
-  phoneNumber: {
+  contactNumber: {
     type: String,
     required: true,
   },
@@ -25,3 +25,6 @@ const userSchema = new mongoose.Schema({
     required: true,
   },
 });
+
+
+module.exports=mongoose.model("User",userSchema);
