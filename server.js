@@ -1,34 +1,24 @@
 const express = require("express");
-const cookieParser = require("cookie-parser");
-const dotenv = require("dotenv");
-const cors = require("cors");
-const dbConnect = require("./config/database");
-// const { upload, imageUploadUtil } = require("./helpers/cloudinary");
-
-const authRouter = require("./routes/auth/auth-routes");
-
 const app = express();
+const cookieParser = require("cookie-parser");
+require("dotenv").config();
+// const cors = require("cors");
+const dbConnect = require("./config/database");
 const PORT = process.env.PORT || 5000;
-dotenv.config();
+
+// importing routes
+const userRoutes = require("./routes/userRoute");
+
 dbConnect();
 
 // middleware setup
-app.use(cookieParser());
 app.use(express.json());
-app.use(cors());
-
-// // Add route to handle image upload using Cloudinary
-// app.post("/api/upload", upload.single("file"), async (req, res) => {
-//   try {
-//     const result = await imageUploadUtil(req.file);
-//     res.json({ message: "Upload successful", url: result.secure_url });
-//   } catch (error) {
-//     res.status(500).json({ error: "Upload failed", details: error.message });
-//   }
-// });
+app.use(cookieParser());
+app.use(express.urlencoded({ extended: false }));
+// app.use(cors());
 
 // route handlers
-app.use("/api/auth", authRouter);
+app.use("/api/v1/auth", userRoutes);
 
 // start server
 app.listen(PORT, () => console.log(`Server is now running on port ${PORT}`));
