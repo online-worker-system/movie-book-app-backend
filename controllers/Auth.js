@@ -3,6 +3,7 @@ const OTP= require("../models/OTP");
 const otpGenerator= require("otp-generator");
 const bcrypt=require("bcrypt");
 const jwt=require("jsonwebtoken");
+const Cinema = require("../models/Cinema");
 require("dotenv").config();
 //sendOTP
 
@@ -221,6 +222,8 @@ exports.login = async(req,res) => {
                 role:user.accountType
             }
             //generate JWT token
+
+          
             const token= jwt.sign(payload,process.env.JWT_SECRET,{
                 expiresIn:"2h",
             });

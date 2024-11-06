@@ -1,11 +1,6 @@
 const mongoose = require("mongoose");
 
 const movieShowSchema = new mongoose.Schema({
-  showId: {
-    type: Number,
-    required: true,
-    unique: true,
-  },
   showTime: {
     type: Date,
     required: true,

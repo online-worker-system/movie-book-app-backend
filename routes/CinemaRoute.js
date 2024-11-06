@@ -8,7 +8,7 @@ const {
 } = require("../controllers/City")
 
 
-const {addCinema,updateScreen} = require("../controllers/Cinema");
+const {addCinema,updateScreen,findCinemaDetailes} = require("../controllers/Cinema");
 const { auth,isAdmin,isViewer } = require("../middlewares/auth")
 
 // Routes for Login, Signup, and Authentication
@@ -24,4 +24,6 @@ router.post("/addCinema",auth,isAdmin,addCinema);
 
 router.post("/updateScreen",auth,isAdmin,updateScreen);
 
+
+router.get("/getCinemaDetailes",auth,isAdmin,findCinemaDetailes);
 module.exports = router;

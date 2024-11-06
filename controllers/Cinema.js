@@ -73,7 +73,34 @@ exports.addCinema = async(req,res) =>{
 
 
 
-
+exports.findCinemaDetailes = async (req,res) => {
+  try{
+     
+    const adminId=req.user.id;
+   
+    console.log(adminId)
+    const findCinema=await Cinema.find({
+      adminDetailes:adminId
+    });
+    
+    if(findCinema)
+    {
+      return res.status(200).json({
+        success:true,
+        message:"Cinema deatiles feched",
+        cinema:findCinema
+      })
+    }
+  }catch(error)
+  {
+    console.log("Error while finding Cinema :",error);
+    return res.status(500).json({
+      success:false,
+      message:"Error while finding Cinema",
+      error:error
+    })
+  }
+}
 
 
 
