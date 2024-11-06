@@ -1,11 +1,6 @@
 const mongoose = require("mongoose");
 
 const cinemaSchema = new mongoose.Schema({
-  cinemaId: {
-    type: Number,
-    required: true,
-    unique: true,
-  },
   cinemaName: {
     type: String,
     required: true,
@@ -21,8 +16,13 @@ const cinemaSchema = new mongoose.Schema({
     required: true,
   },
   cityId: {
-    type: Number,
+    type: mongoose.Schema.Types.ObjectId,
     ref: "City",
+    required: true,
+  },
+  adminDetailes: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "User",
     required: true,
   },
 });

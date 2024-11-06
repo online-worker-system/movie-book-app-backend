@@ -12,7 +12,7 @@ exports.auth = async (req, res, next) => {
       req.header("Authorization").replace("Bearer", "");
 
     if (!token) {
-      return res.satus(401).json({
+      return res.status(401).json({
         success: false,
         message: "Token is missing",
       });
@@ -23,7 +23,7 @@ exports.auth = async (req, res, next) => {
       console.log(decode);
       req.user = decode;
     } catch (error) {
-      return res.satus(401).json({
+      return res.status(401).json({
         success: false,
         message: "token is invalid",
       });
@@ -40,15 +40,15 @@ exports.auth = async (req, res, next) => {
 // isViewer
 exports.isViewer = async (req, res, next) => {
   try {
-    if (req.user.accountType !== "Viewer") {
-      return res.satus(401).json({
+    if (req.user.role !== "Viewer") {
+      return res.status(401).json({
         success: false,
         message: "This is a protected route for Viewer",
       });
     }
     next();
   } catch (error) {
-    return res.satus().json({
+    return res.status(500).json({
       success: false,
       message: "User Role cannot be verified, please try later",
     });
@@ -58,15 +58,33 @@ exports.isViewer = async (req, res, next) => {
 // isAdmin
 exports.isAdmin = async (req, res, next) => {
   try {
-    if (req.user.accountType !== "Admin") {
-      return res.satus(401).json({
+    if (req.user.role !== "Admin") {
+      return res.status(401).json({
         success: false,
-        message: "This is a protected route for Viewer",
+        message: "This is a protected route for Admin",
       });
     }
     next();
   } catch (error) {
-    return res.satus().json({
+    return res.status(500).json({
+      success: false,
+      message: "User Role cannot be verified, please try later",
+    });
+  }
+};
+
+// isSuperAdmin
+exports.isSuperAdmin = async (req, res, next) => {
+  try {
+    if (req.user.role !== "SuperAdmin") {
+      return res.status(401).json({
+        success: false,
+        message: "This is a protected route for SuperAdmin",
+      });
+    }
+    next();
+  } catch (error) {
+    return res.status(500).json({
       success: false,
       message: "User Role cannot be verified, please try later",
     });

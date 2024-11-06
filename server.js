@@ -2,12 +2,12 @@ const express = require("express");
 const app = express();
 const cookieParser = require("cookie-parser");
 require("dotenv").config();
-// const cors = require("cors");
 const dbConnect = require("./config/database");
 const PORT = process.env.PORT || 5000;
 
 // importing routes
 const userRoutes = require("./routes/userRoute");
+const cinemaRoutes = require("./routes/CinemaRoute");
 
 dbConnect();
 
@@ -15,7 +15,6 @@ dbConnect();
 app.use(express.json());
 app.use(cookieParser());
 app.use(express.urlencoded({ extended: false }));
-// app.use(cors());
 
 // route handlers
 app.use("/api/v1/auth", userRoutes);
