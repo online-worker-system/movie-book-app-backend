@@ -7,7 +7,7 @@ const PORT = process.env.PORT || 5000;
 
 // importing routes
 const userRoutes = require("./routes/userRoute");
-const cinemaRoutes = require("./routes/CinemaRoute");
+const cinemaRoutes = require("./routes/cinemaRoute");
 
 dbConnect();
 

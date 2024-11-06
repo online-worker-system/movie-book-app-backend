@@ -19,7 +19,7 @@ const userSchema = new mongoose.Schema({
     type: String,
     required: true,
   },
-  role: {
+  accountType: {
     type: String,
     enum: ["SuperAdmin", "Admin", "Viewer"],
     required: true,
