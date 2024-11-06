@@ -1,5 +1,25 @@
 const Movie = require("../models/Movie");
 
+exports.getAllMovies = async (req, res) => {
+  try {
+    // fetch all movies
+    const movies = await Movie.find();
+
+    // return response
+    return res.status(200).json({
+      success: true,
+      data: movies,
+      message: "All Movies fetched successfully",
+    });
+  } catch (error) {
+    return res.status(500).json({
+      success: false,
+      error: error.message,
+      message: "Unable to fetch All Movies, please try again",
+    });
+  }
+};
+
 exports.getMovieDetails = async (req, res) => {
   try {
     // fetch course details
@@ -17,7 +37,7 @@ exports.getMovieDetails = async (req, res) => {
     // return response
     return res.status(200).json({
       success: true,
-      data: courseDetails,
+      data: movieDetails,
       message: "Movie Details fetched successfully",
     });
   } catch (error) {
@@ -40,9 +60,11 @@ exports.addMovie = async (req, res) => {
       castMembers,
       supportingLanguages,
     } = req.body;
+    console.log("body: ", req.body);
+    // console.log('Request Headers:', req.headers);
 
     // get thumbnail and userId
-    const thumbnail = req.files.thumbnailImage;
+    const thumbnail = null;
 
     // validation
     if (
@@ -54,17 +76,17 @@ exports.addMovie = async (req, res) => {
       !supportingLanguages ||
       !thumbnail
     ) {
-      return res.status(402).json({
+      return res.status(404).json({
         success: false,
         message: "Please enter all the details",
       });
     }
 
-    // upload image to cloudinary
-    const thumbnailUpload = await uploadFileToCloudinary(
-      thumbnail,
-      process.env.FOLDER_IMAGE
-    );
+    // // upload image to cloudinary
+    // const thumbnailUpload = await uploadFileToCloudinary(
+    //   thumbnail,
+    //   process.env.FOLDER_IMAGE
+    // );
 
     // create an entry for new course
     const newMovie = await Movie.create({
@@ -74,7 +96,7 @@ exports.addMovie = async (req, res) => {
       genres,
       castMembers,
       supportingLanguages,
-      thumbnail: thumbnailUpload.secure_url,
+      thumbnail: "null",
     });
     console.log("newMovie: ", newMovie);
 
@@ -98,6 +120,7 @@ exports.updateMovie = async (req, res) => {
     // fetch data
     const { movieId } = req.body;
     const updates = req.body;
+    console.log("up: ", req.body);
 
     // validation
     const movie = await Movie.findById(movieId);
@@ -108,15 +131,15 @@ exports.updateMovie = async (req, res) => {
       });
     }
 
-    // If Thumbnail Image is found, update it
-    if (req.files) {
-      const thumbnail = req.files.thumbnailImage;
-      const thumbnailImage = await uploadFileToCloudinary(
-        thumbnail,
-        process.env.FOLDER_IMAGE
-      );
-      movie.thumbnail = thumbnailImage.secure_url;
-    }
+    // // If Thumbnail Image is found, update it
+    // if (req.files) {
+    //   const thumbnail = req.files.thumbnailImage;
+    //   const thumbnailImage = await uploadFileToCloudinary(
+    //     thumbnail,
+    //     process.env.FOLDER_IMAGE
+    //   );
+    //   movie.thumbnail = thumbnailImage.secure_url;
+    // }
 
     // Update only the fields that are present in the request body
     for (const key in updates) {

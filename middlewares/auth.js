@@ -8,8 +8,9 @@ exports.auth = async (req, res, next) => {
     // extract token
     const token =
       req.cookies.token ||
-      req.body.token ||
-      req.header("Authorization").replace("Bearer", "");
+      req.body.token;
+      // req.header("Authorization").replace("Bearer", "");
+      console.log("auth-token: ", token);
 
     if (!token) {
       return res.status(401).json({
@@ -20,7 +21,7 @@ exports.auth = async (req, res, next) => {
 
     try {
       const decode = jwt.verify(token, process.env.JWT_SECRET);
-      console.log(decode);
+      // console.log("decode: ", decode);
       req.user = decode;
     } catch (error) {
       return res.status(401).json({
@@ -30,8 +31,9 @@ exports.auth = async (req, res, next) => {
     }
     next();
   } catch (error) {
-    return res.satus(500).json({
+    return res.status(500).json({
       success: false,
+      error: error.message,
       message: "somthing went wrong while validating token",
     });
   }

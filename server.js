@@ -1,6 +1,7 @@
 const express = require("express");
 const app = express();
 const cookieParser = require("cookie-parser");
+const cors = require("cors");
 require("dotenv").config();
 const dbConnect = require("./config/database");
 const PORT = process.env.PORT || 5000;
@@ -13,6 +14,13 @@ const movieRoutes = require("./routes/movieRoute");
 dbConnect();
 
 // middleware setup
+app.use(
+  cors({
+    origin: "http://localhost:3000",
+    methods: ["GET", "POST", "DELETE", "PUT"],
+    credentials: true,
+  })
+);
 app.use(express.json());
 app.use(cookieParser());
 app.use(express.urlencoded({ extended: false }));
