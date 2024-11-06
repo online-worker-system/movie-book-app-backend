@@ -52,8 +52,8 @@ exports.sendOTP = async (req, res) => {
     console.log("OTP sent nhi kar paya: ", error);
     return res.status(500).json({
       success: false,
+      error: error.message,
       message: "OTP not sent",
-      error: error,
     });
   }
 };
@@ -143,15 +143,15 @@ exports.signup = async (req, res) => {
 
     return res.status(200).json({
       success: true,
+      user,
       message: "Signup successfully hua",
-      user: user,
     });
   } catch (error) {
     console.log("Signup nhi kar paya: ", error);
     return res.status(500).json({
       success: false,
+      error: error.message,
       message: "Signup nhi ho paya kuch dikat aa gayi",
-      error: error,
     });
   }
 };
@@ -217,8 +217,8 @@ exports.login = async (req, res) => {
     console.log("login is not possible ", error);
     return res.status(500).json({
       success: false,
+      error: error.message,
       message: "Login nhi ho paya kuch dikat aa gayi",
-      error: error,
     });
   }
 };

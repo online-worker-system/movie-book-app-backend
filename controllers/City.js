@@ -29,7 +29,7 @@ exports.addCity = async (req, res) => {
     console.log("Problem while Adding City :", error);
     return res.status(500).json({
       success: false,
-      error: error,
+      error: error.message,
       message: "Error while create a City",
     });
   }

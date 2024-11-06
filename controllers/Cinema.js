@@ -37,14 +37,14 @@ exports.addCinema = async (req, res) => {
 
     return res.status(200).json({
       success: true,
-      cinema: newCinema,
+      data: newCinema,
       message: "Cinema Added successfully",
     });
   } catch (error) {
     console.log("Cinema Add nhi kar pa rha hu ", error);
     return res.status(500).json({
       success: false,
-      error: error,
+      error: error.message,
       message: "while adding cinema some issue",
     });
   }

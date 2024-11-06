@@ -7,6 +7,8 @@ const PORT = process.env.PORT || 5000;
 
 // importing routes
 const userRoutes = require("./routes/userRoute");
+const cinemaRoutes = require("./routes/tempCinemaRoute");
+const movieRoutes = require("./routes/movieRoute");
 
 dbConnect();
 
@@ -17,6 +19,8 @@ app.use(express.urlencoded({ extended: false }));
 
 // route handlers
 app.use("/api/v1/auth", userRoutes);
+app.use("/api/v1/cinema", cinemaRoutes);
+app.use("/api/v1/movie", movieRoutes);
 
 // start server
 app.listen(PORT, () => console.log(`Server is now running on port ${PORT}`));
