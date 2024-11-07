@@ -33,7 +33,6 @@ exports.addCinema = async (req, res) => {
       cityId: findCity._id,
       adminDetailes,
     });
-    console.log("newcinema: ", newCinema);
 
     return res.status(200).json({
       success: true,
@@ -41,7 +40,6 @@ exports.addCinema = async (req, res) => {
       message: "Cinema Added successfully",
     });
   } catch (error) {
-    console.log("Cinema Add nhi kar pa rha hu ", error);
     return res.status(500).json({
       success: false,
       error: error.message,

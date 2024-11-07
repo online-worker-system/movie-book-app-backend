@@ -1,4 +1,5 @@
 const Movie = require("../models/Movie");
+const { uploadFileToCloudinary } = require("../utils/fileUploader");
 
 exports.getAllMovies = async (req, res) => {
   try {
@@ -60,11 +61,9 @@ exports.addMovie = async (req, res) => {
       castMembers,
       supportingLanguages,
     } = req.body;
-    console.log("body: ", req.body);
-    // console.log('Request Headers:', req.headers);
 
-    // get thumbnail and userId
-    const thumbnail = null;
+    // get thumbnail image
+    const thumbnail = req.files.thumbnailImage;
 
     // validation
     if (
@@ -82,11 +81,11 @@ exports.addMovie = async (req, res) => {
       });
     }
 
-    // // upload image to cloudinary
-    // const thumbnailUpload = await uploadFileToCloudinary(
-    //   thumbnail,
-    //   process.env.FOLDER_IMAGE
-    // );
+    // upload image to cloudinary
+    const thumbnailUpload = await uploadFileToCloudinary(
+      thumbnail,
+      process.env.FOLDER_IMAGE
+    );
 
     // create an entry for new course
     const newMovie = await Movie.create({
@@ -96,9 +95,8 @@ exports.addMovie = async (req, res) => {
       genres,
       castMembers,
       supportingLanguages,
-      thumbnail: "null",
+      thumbnail: thumbnailUpload?.secure_url,
     });
-    console.log("newMovie: ", newMovie);
 
     return res.status(200).json({
       success: true,
@@ -106,11 +104,10 @@ exports.addMovie = async (req, res) => {
       message: "Movie Added Successfully",
     });
   } catch (error) {
-    console.log("Problem while Adding Movie :", error);
     return res.status(500).json({
       success: false,
       error: error.message,
-      message: "Unable to Add Movie, please try againe",
+      message: "Unable to Add Movie, please try again",
     });
   }
 };
@@ -120,7 +117,6 @@ exports.updateMovie = async (req, res) => {
     // fetch data
     const { movieId } = req.body;
     const updates = req.body;
-    console.log("up: ", req.body);
 
     // validation
     const movie = await Movie.findById(movieId);
@@ -131,15 +127,15 @@ exports.updateMovie = async (req, res) => {
       });
     }
 
-    // // If Thumbnail Image is found, update it
-    // if (req.files) {
-    //   const thumbnail = req.files.thumbnailImage;
-    //   const thumbnailImage = await uploadFileToCloudinary(
-    //     thumbnail,
-    //     process.env.FOLDER_IMAGE
-    //   );
-    //   movie.thumbnail = thumbnailImage.secure_url;
-    // }
+    // If Thumbnail Image is found, update it
+    if (req.files) {
+      const thumbnail = req.files.thumbnailImage;
+      const thumbnailImage = await uploadFileToCloudinary(
+        thumbnail,
+        process.env.FOLDER_IMAGE
+      );
+      movie.thumbnail = thumbnailImage.secure_url;
+    }
 
     // Update only the fields that are present in the request body
     for (const key in updates) {
@@ -147,17 +143,12 @@ exports.updateMovie = async (req, res) => {
     }
     await movie.save();
 
-    // updated course details
-    const updatedMovie = await Movie.findById(movieId);
-    console.log("updatedMovie: ", updatedMovie);
-
     return res.status(200).json({
       success: true,
-      data: updatedMovie,
+      data: movie,
       message: "Movie Updated Successfully",
     });
   } catch (error) {
-    console.log("Problem while Updating Movie :", error);
     return res.status(500).json({
       success: false,
       error: error.message,
@@ -171,8 +162,8 @@ exports.deleteMovie = async (req, res) => {
     // fetch data
     const { movieId } = req.body;
 
-    // validation
-    const movie = await Movie.findById(movieId);
+    // delete the movie
+    const movie = await Movie.findByIdAndDelete(movieId);
     if (!movie) {
       return res.status(404).json({
         success: false,
@@ -180,16 +171,12 @@ exports.deleteMovie = async (req, res) => {
       });
     }
 
-    // Delete the movie
-    await Movie.findByIdAndDelete(movieId);
-
     // return response
     return res.status(200).json({
       success: true,
       message: "Movie deleted successfully",
     });
   } catch (error) {
-    console.log("Problem while Deleting Movie :", error);
     return res.status(500).json({
       success: false,
       error: error.message,

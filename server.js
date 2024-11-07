@@ -1,9 +1,11 @@
 const express = require("express");
 const app = express();
-const cookieParser = require("cookie-parser");
 const cors = require("cors");
+const cookieParser = require("cookie-parser");
+const fileUpload = require("express-fileupload");
 require("dotenv").config();
 const dbConnect = require("./config/database");
+const { cloudinaryConnect } = require("./config/cloudinary");
 const PORT = process.env.PORT || 5000;
 
 // importing routes
@@ -11,19 +13,20 @@ const userRoutes = require("./routes/userRoute");
 const cinemaRoutes = require("./routes/cinemaRoute");
 const movieRoutes = require("./routes/movieRoute");
 
-dbConnect();
-
 // middleware setup
-app.use(
-  cors({
-    origin: "http://localhost:3000",
-    methods: ["GET", "POST", "DELETE", "PUT"],
-    credentials: true,
-  })
-);
+app.use(cors());
 app.use(express.json());
 app.use(cookieParser());
-app.use(express.urlencoded({ extended: false }));
+app.use(
+  fileUpload({
+    useTempFiles: true,
+    tempFileDir: "/tmp/",
+  })
+);
+
+// connections
+dbConnect();
+cloudinaryConnect();
 
 // route handlers
 app.use("/api/v1/auth", userRoutes);

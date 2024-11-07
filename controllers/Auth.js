@@ -3,7 +3,6 @@ const OTP = require("../models/OTP");
 const otpGenerator = require("otp-generator");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
-// require("dotenv").config();
 
 // sendOTP
 exports.sendOTP = async (req, res) => {
@@ -44,12 +43,11 @@ exports.sendOTP = async (req, res) => {
     const otpBody = await OTP.create(otpPayload);
     console.log("otpBody: ", otpBody);
 
-    res.status(200).json({
+    return res.status(200).json({
       success: true,
       message: "OTP Sent Successfully",
     });
   } catch (error) {
-    console.log("OTP sent nhi kar paya: ", error);
     return res.status(500).json({
       success: false,
       error: error.message,
@@ -72,8 +70,6 @@ exports.signup = async (req, res) => {
       otp,
     } = req.body;
 
-    console.log("reqBody: ", req.body);
-
     // validate krlo
     if (
       !userName ||
@@ -94,7 +90,7 @@ exports.signup = async (req, res) => {
     if (password !== confirmPassword) {
       return res.status(400).json({
         success: false,
-        message: "Password adn ConfirmPassword",
+        message: "Password and ConfirmPassword not matched",
       });
     }
 
@@ -121,7 +117,6 @@ exports.signup = async (req, res) => {
         message: "OTP not found",
       });
     } else if (otp !== recentOtp[0].otp) {
-      console.log("otps: ", otp, recentOtp[0].otp);
       return res.status(400).json({
         success: false,
         message: "OTP not matched",
@@ -144,10 +139,9 @@ exports.signup = async (req, res) => {
     return res.status(200).json({
       success: true,
       user,
-      message: "Signup successfully hua",
+      message: "Signup successfully",
     });
   } catch (error) {
-    console.log("Signup nhi kar paya: ", error);
     return res.status(500).json({
       success: false,
       error: error.message,
@@ -201,7 +195,7 @@ exports.login = async (req, res) => {
         httpOnly: true,
       };
 
-      res.cookie("token", token, options).status(200).json({
+      return res.cookie("token", token, options).status(200).json({
         success: true,
         token,
         user,
@@ -214,7 +208,6 @@ exports.login = async (req, res) => {
       });
     }
   } catch (error) {
-    console.log("login is not possible ", error);
     return res.status(500).json({
       success: false,
       error: error.message,
