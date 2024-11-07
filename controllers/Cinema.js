@@ -31,7 +31,7 @@ exports.addCinema = async (req, res) => {
     const newCinema = await Cinema.create({
       cinemaName,
       pincode,
-      cityId: findCity._id,
+      cityId,
       adminDetailes,
     });
 

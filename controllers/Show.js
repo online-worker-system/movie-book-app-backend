@@ -6,7 +6,7 @@ const { assign } = require("nodemailer/lib/shared");
 
 exports.addShow = async (req, res) => {
   try {
-    const { showStart, showEnd, movieId, screenId } = req.body;
+    const { showStart, showEnd, movieId, cinemaId, screenId } = req.body;
 
     const findScreen = await MovieShow.find({ screenId: screenId });
     console.log("findScreen: ", findScreen);
@@ -17,6 +17,7 @@ exports.addShow = async (req, res) => {
         showEnd,
         movieId,
         isLive: false,
+        cinemaId,
         screenId,
       });
 
@@ -48,6 +49,7 @@ exports.addShow = async (req, res) => {
       showEnd,
       movieId,
       isLive: false,
+      cinemaId,
       screenId,
     });
 
@@ -93,23 +95,25 @@ exports.doLiveShow = async (req, res) => {
       });
     }
 
-    const newSeatArray = [];
-    findScreen.seats.forEach(async (value) => {
+    let newSeatArray = [];
+    for (const value of findScreen.seats) {
       const newSeat = await showSeatSchema.create({
         seatId: value,
         showId: showId,
         price: 200,
         status: "FREE",
       });
-
       newSeatArray.push(newSeat._id);
-    });
-
-    await MovieShow.findByIdAndUpdate(
+    }
+    console.log("newseat: ", newSeatArray);
+    const updatedshow = await MovieShow.findByIdAndUpdate(
       findShow._id,
       { showSeats: newSeatArray },
       { new: true }
     );
+    console.log("sjow: ", updatedshow);
+
+    console.log("finshsow: ", findShow);
 
     return res.status(200).json({
       success: true,
