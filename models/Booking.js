@@ -3,11 +3,6 @@ const mongoose = require("mongoose");
 const BookingStatus = ["BOOKED", "CANCELLED"];
 
 const bookingSchema = new mongoose.Schema({
-  bookingId: {
-    type: Number,
-    required: true,
-    unique: true,
-  },
   showId: {
     type: mongoose.Schema.Types.ObjectId,
     ref: "MovieShow",

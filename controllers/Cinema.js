@@ -2,6 +2,7 @@ const User = require("../models/User");
 const Cinema = require("../models/Cinema");
 const Screen = require("../models/Screen");
 const City = require("../models/City");
+const Seat = require("../models/Seat");
 
 exports.addCinema = async (req, res) => {
   try {
@@ -34,6 +35,19 @@ exports.addCinema = async (req, res) => {
       adminDetailes,
     });
 
+    if (newCinema) {
+      const newScreen = await Screen.create({
+        cinemaId: newCinema._id,
+      });
+
+      // Update cinema's screens array with new screen ID
+      await Cinema.findByIdAndUpdate(
+        newCinema._id,
+        { $push: { screens: newScreen._id } },
+        { new: true }
+      );
+    }
+
     return res.status(200).json({
       success: true,
       data: newCinema,
@@ -44,6 +58,88 @@ exports.addCinema = async (req, res) => {
       success: false,
       error: error.message,
       message: "while adding cinema some issue",
+    });
+  }
+};
+
+exports.findCinemaDetailes = async (req, res) => {
+  try {
+    const adminId = req.user.id;
+    console.log("adminId: ", adminId);
+
+    const findCinema = await Cinema.find({
+      adminDetailes: adminId,
+    });
+
+    if (!findCinema) {
+      return res.status(200).json({
+        success: false,
+        message: "Cinema not found",
+      });
+    }
+
+    return res.status(200).json({
+      success: true,
+      data: findCinema,
+      message: "Cinema details fetched",
+    });
+  } catch (error) {
+    return res.status(500).json({
+      success: false,
+      error: error.message,
+      message: "Error while finding Cinema",
+    });
+  }
+};
+
+exports.updateScreen = async (req, res) => {
+  try {
+    const { regular, vip, bolcony, screenId } = req.body;
+    const seatIds = [];
+
+    // Create seats for 'regular' category and add their IDs to seatIds
+    for (let i = 0; i < regular.seat; i++) {
+      const newSeat = await Seat.create({
+        seatType: regular.name,
+        seatNumber: i + 1,
+      });
+      seatIds.push(newSeat._id);
+    }
+
+    // Create seats for 'vip' category and add their IDs to seatIds
+    for (let i = 0; i < vip.seat; i++) {
+      const newSeat = await Seat.create({
+        seatType: vip.name,
+        seatNumber: i + 1,
+      });
+      seatIds.push(newSeat._id);
+    }
+
+    // Create seats for 'bolcony' category and add their IDs to seatIds
+    for (let i = 0; i < bolcony.seat; i++) {
+      const newSeat = await Seat.create({
+        seatType: bolcony.name,
+        seatNumber: i + 1,
+      });
+      seatIds.push(newSeat._id);
+    }
+
+    // Update the screen with all the seat IDs in one database call
+    await Screen.findByIdAndUpdate(
+      screenId,
+      { $push: { seats: { $each: seatIds } } },
+      { new: true }
+    );
+
+    return res.status(200).json({
+      success: true,
+      message: "Screen updated successfully",
+    });
+  } catch (error) {
+    return res.status(500).json({
+      success: false,
+      error: error.message,
+      message: "Error while updating screen",
     });
   }
 };

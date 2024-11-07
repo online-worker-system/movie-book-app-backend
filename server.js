@@ -12,6 +12,7 @@ const PORT = process.env.PORT || 5000;
 const userRoutes = require("./routes/userRoute");
 const cinemaRoutes = require("./routes/cinemaRoute");
 const movieRoutes = require("./routes/movieRoute");
+const showRoutes = require("./routes/showRoute");
 const paymentRoutes = require("./routes/paymentRoute");
 
 // middleware setup
@@ -33,6 +34,7 @@ cloudinaryConnect();
 app.use("/api/v1/auth", userRoutes);
 app.use("/api/v1/cinema", cinemaRoutes);
 app.use("/api/v1/movie", movieRoutes);
+app.use("/api/v1/show", showRoutes);
 app.use("/api/v1/payment", paymentRoutes);
 
 // start server
