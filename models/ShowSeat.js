@@ -24,4 +24,5 @@ const showSeatSchema = new mongoose.Schema({
   },
 });
 
+
 module.exports = mongoose.model("ShowSeat", showSeatSchema);

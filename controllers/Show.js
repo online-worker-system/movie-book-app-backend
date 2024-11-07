@@ -75,70 +75,59 @@ exports.addShow = async (req, res) => {
 
 
 
-exports.doLiveShow = async (req,res) => {
-    try{
+exports.doLiveShow = async (req, res) => {
+  try {
+    const { showId } = req.body;
 
-        const {showId} = req.body;
+    const findShow = await MovieShow.findById(showId);
 
-        const findShow = await MovieShow.findById(showId);
-
-        if(!findShow || findShow.isLive)
-        {
-            return res.status(404).json({
-                success:false,
-                message:"Show not found please enter correct id"
-            })
-        }
-
-        await MovieShow.findByIdAndUpdate(
-            findShow._id,
-            { isLive:true} ,
-            { new: true }
-          );
-
-
-          const findScreen= await Screen.findById(findShow.screenId);
-
-          if(!findScreen)
-          {
-            return res.status(404).json({
-                success:false,
-                message:"Screen is not found regarding to show"
-            })
-          }
-
-          const newSeatArray=[];
-          findScreen.seats.forEach(async (value)=>{
-               const newSeat= await showSeatSchema.create({
-                seatId:value,
-                showId:showId,
-                price:200,
-                status:"FREE"
-               })
-
-               newSeatArray.push(newSeat._id);
-
-          })
-
-          await MovieShow.findByIdAndUpdate(
-            findShow._id,
-            { showSeats:newSeatArray} ,
-            { new: true }
-          );
-
-
-          return res.status(200).json({
-            success:true,
-            message:"Your show is live now"
-          })
-
-    }catch(error)
-    {
-        console.log("somthing went wrong while live show: ",error);
-        return res.status(500).json({
-            success:false,
-            message:"Somthing went wrong while live show",
-            error:error
-        })
+    if (!findShow || findShow.isLive) {
+      return res.status(404).json({
+        success: false,
+        message: "Show not found or already live. Please enter a correct ID.",
+      });
     }
-}
+
+    await MovieShow.findByIdAndUpdate(findShow._id, { isLive: true }, { new: true });
+
+    const findScreen = await Screen.findById(findShow.screenId);
+
+    if (!findScreen) {
+      return res.status(404).json({
+        success: false,
+        message: "Screen not found for the specified show.",
+      });
+    }
+
+    const newSeatArray = [];
+    for (const value of findScreen.seats) {
+      const newSeat = await showSeatSchema.create({
+        seatId: value,
+        showId: showId,
+        price: 200,
+        status: "FREE",
+      });
+      console.log(newSeat);
+      newSeatArray.push(newSeat._id);
+    }
+
+    console.log(newSeatArray);
+   
+    await MovieShow.findByIdAndUpdate(findShow._id, { showSeats: newSeatArray }, { new: true });
+
+    console.log(findShow);
+
+    return res.status(200).json({
+      success: true,
+      message: "Your show is live now.",
+    });
+
+  } catch (error) {
+    console.log("Something went wrong while making the show live:", error);
+    return res.status(500).json({
+      success: false,
+      message: "Something went wrong while making the show live.",
+      error: error.message,
+    });
+  }
+};
