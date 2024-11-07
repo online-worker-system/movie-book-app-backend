@@ -87,3 +87,22 @@ exports.isAdmin =  async(req,res,next) => {
         })
     }
 };
+
+//isSuperAdmin
+
+exports.isSuperAdmin = async (req, res, next) => {
+    try {
+      if (req.user.role !== "SuperAdmin") {
+        return res.status(401).json({
+          success: false,
+          message: "This is a protected route for SuperAdmin",
+        });
+      }
+      next();
+    } catch (error) {
+      return res.status(500).json({
+        success: false,
+        message: "User Role cannot be verified, please try later",
+      });
+    }
+  };
