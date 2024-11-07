@@ -14,7 +14,7 @@ const seatSchema = new mongoose.Schema({
     required: true,
   },
   seatNumber: {
-    type: String,
+    type:Number,
     required: true,
   },
   // row: {
