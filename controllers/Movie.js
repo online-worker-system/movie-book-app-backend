@@ -1,5 +1,5 @@
 const Movie = require("../models/Movie");
-
+const MovieShow = require("../models/MovieShow");
 exports.getAllMovies = async (req, res) => {
   try {
     // fetch all movies
@@ -192,6 +192,87 @@ exports.deleteMovie = async (req, res) => {
       success: false,
       error: error.message,
       message: "Unable to Delete Movie, please try again",
+    });
+  }
+};
+
+
+exports.getMovieCinema = async (req, res) => {
+  try {
+    // fetch course details
+    const { movieId } = req.body;
+
+    console.log(movieId)
+    // Find the MovieShow document that matches the movieId and isLive is true
+    const uniqueCinemas = await MovieShow.find({
+      movieId: movieId,
+      isLive: true,
+    })
+      .populate({
+        path: "cinemaId",
+        model: "Cinema",
+        populate: {
+          path: "cityId",
+          model: "City",
+        },
+      })
+      .populate({
+        path: "showSeats",
+        model: "ShowSeat",
+        select: "seatId price status",
+      });
+
+    if (!uniqueCinemas) {
+      return res.status(404).json({
+        success: false,
+        message: "No live movie show found for this movie.",
+      });
+    }
+
+    console.log(uniqueCinemas)
+    const tempData = uniqueCinemas.map((show) => {
+      return {
+        showStart: show.showStart,
+        showEnd: show.showEnd,
+        movieId: show.movieId,
+        isLive: show.isLive,
+        cinemas: {
+          cinemaId: show.cinemaId._id,
+          cinemaName: show.cinemaId.cinemaName,
+          screens: show.cinemaId.screens,
+          pincode: show.cinemaId.pincode,
+          city: show.cinemaId.cityId.cityName,
+          adminDetailes: show.cinemaId.adminDetailes,
+          showScreenId: show.screenId,
+          showSeats: show.showSeats,
+        },
+      };
+    });
+
+    const arr = [];
+    for (const key of tempData) {
+      arr.push(key.cinemas);
+    }
+
+    const finalData = {
+      showStart: tempData[0].showStart,
+      showEnd: tempData[0].showEnd,
+      movieId: tempData[0].movieId,
+      isLive: tempData[0].isLive,
+      cinemas: arr,
+    };
+
+    // return response
+    return res.status(200).json({
+      success: true,
+      data: finalData,
+      message: "MovieShow and cinema details fetched successfully",
+    });
+  } catch (error) {
+    return res.status(500).json({
+      success: false,
+      error: error.message,
+      message: "Unable to fetch Movie Show, please try again",
     });
   }
 };

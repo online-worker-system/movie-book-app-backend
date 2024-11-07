@@ -14,6 +14,11 @@ const movieShowSchema = new mongoose.Schema({
     ref: "Movie",
     required: true,
   },
+  cinemaId:{
+    type:mongoose.Schema.Types.ObjectId,
+    ref:"Cinema",
+    required:true
+  },
   screenId: {
     type: mongoose.Schema.Types.ObjectId,
     ref: "Screen",

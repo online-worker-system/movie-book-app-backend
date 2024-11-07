@@ -5,7 +5,7 @@ const Seat = require("../models/Seat");
 const showSeatSchema=require("../models/ShowSeat");
 exports.addShow = async (req, res) => {
   try {
-    const { showStart, showEnd, movieId, screenId } = req.body;
+    const { showStart, showEnd, movieId, screenId,cinemaId } = req.body;
 
     const findScreen = await MovieShow.find({ screenId: screenId });
 
@@ -15,6 +15,7 @@ exports.addShow = async (req, res) => {
       const newShow = await MovieShow.create({
         showStart,
         showEnd,
+        cinemaId,
         movieId,
         isLive:false,
         screenId,
@@ -131,3 +132,28 @@ exports.doLiveShow = async (req, res) => {
     });
   }
 };
+
+
+exports.findShowByMovie = async (req,res) => {
+  try{
+
+    const {movieId} = req.body;
+
+    const findAllShows = await MovieShow.find({movieId:movieId});
+
+    return res.status(200).json({
+      success:true,
+      message:"All Shows fetched",
+      allShows:findAllShows
+    })
+
+  }catch(error)
+  {
+    console.log("omething went wrong while finding shows of particular movie",error);
+    return res.status(500).json({
+      success:false,
+      message:"Something went wrong while finding shows of particular movie",
+      error:error
+    })
+  }
+}
