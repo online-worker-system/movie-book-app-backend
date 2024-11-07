@@ -84,11 +84,11 @@ exports.getMovieCinema = async (req, res) => {
 
     const tempData = uniqueCinemas.map((show) => {
       return {
-        showStart: show.showStart,
-        showEnd: show.showEnd,
         movieId: show.movieId,
         isLive: show.isLive,
         cinemas: {
+          showStart: show.showStart,
+          showEnd: show.showEnd,
           cinemaId: show.cinemaId._id,
           cinemaName: show.cinemaId.cinemaName,
           screens: show.cinemaId.screens,
