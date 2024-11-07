@@ -1,14 +1,9 @@
 const mongoose = require("mongoose");
 
-const Genre = ["ACTION", "COMEDY", "DRAMA", "THRILLER", "SCI-FI"];
-const Language = ["ENGLISH", "HINDI", "SPANISH", "FRENCH"];
+const Genre = ["Action", "Comedy", "Drama", "Thriller", "Sci-Fi"];
+const Language = ["English", "Hindi", "Spanish", "French"];
 
 const movieSchema = new mongoose.Schema({
-  movieId: {
-    type: Number,
-    required: true,
-    unique: true,
-  },
   movieName: {
     type: String,
     required: true,
@@ -34,6 +29,9 @@ const movieSchema = new mongoose.Schema({
       enum: Language,
     },
   ],
+  thumbnail: {
+    type: String,
+  },
 });
 
 module.exports = mongoose.model("Movie", movieSchema);

@@ -1,7 +1,6 @@
 const mongoose = require("mongoose");
 
 const screenSchema = new mongoose.Schema({
-  
   cinemaId: {
     type: mongoose.Schema.Types.ObjectId,
     ref: "Cinema",

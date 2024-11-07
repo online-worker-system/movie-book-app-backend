@@ -21,10 +21,9 @@ const userSchema = new mongoose.Schema({
   },
   accountType: {
     type: String,
-    enum: ["Admin", "Viewer"],
+    enum: ["SuperAdmin", "Admin", "Viewer"],
     required: true,
   },
 });
 
-
-module.exports=mongoose.model("User",userSchema);
+module.exports = mongoose.model("User", userSchema);
