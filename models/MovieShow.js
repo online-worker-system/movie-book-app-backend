@@ -5,7 +5,7 @@ const movieShowSchema = new mongoose.Schema({
     type: Date,
     required: true,
   },
-  showEnd:{
+  showEnd: {
     type: Date,
     required: true,
   },
@@ -14,18 +14,18 @@ const movieShowSchema = new mongoose.Schema({
     ref: "Movie",
     required: true,
   },
-  cinemaId:{
-    type:mongoose.Schema.Types.ObjectId,
-    ref:"Cinema",
-    required:true
+  cinemaId: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "Cinema",
+    required: true,
   },
   screenId: {
     type: mongoose.Schema.Types.ObjectId,
     ref: "Screen",
     required: true,
   },
-  isLive:{
-    type:Boolean,
+  isLive: {
+    type: Boolean,
   },
   showSeats: [
     {

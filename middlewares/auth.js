@@ -1,108 +1,92 @@
-const jwt= require("jsonwebtoken");
-require("dotenv").config();
-const user=require("../models/User");
+// const user = require("../models/User");
+const jwt = require("jsonwebtoken");
 
+// auth
+exports.auth = async (req, res, next) => {
+  try {
+    // extract token
+    const token =
+      req.cookies.token ||
+      req.body.token ||
+      req.header("Authorization").replace("Bearer", "");
 
-//auth
-
-exports.auth = async(req,res,next) => {
-    try{
-        //extract token
-        const token = req.cookies.token || req.body.token || req.header("Authorization").replace("Bearer","");
-
-        if(!token)
-        {
-            return res.status(401).json({
-                success:false,
-                message:"Token is missing"
-            })
-        }
-
-        try{
-            const decode=  jwt.verify(token,process.env.JWT_SECRET);
-            console.log(decode);
-            req.user = decode;
-        }
-        catch(error)
-        {
-            return res.status(401).json({
-                success:false,
-                message:'token is invalid'
-            })
-        }
-        next();
-
-    }catch(error)
-    {
-        return res.status(500).json({
-            success:false,
-            message:"somthing went wrong while validating token"
-        })
-
-    }
-};
-
-//isViewer
-
-exports.isViewer =  async(req,res,next) => {
-    try{
-        
-        if(req.user.accountType !== "Viewer")
-        {
-            return res.status(401).json({
-                success:false,
-                message:"This is a protected route for Viewer"
-            })
-        }
-        next();
-
-    }catch(error)
-    {
-        return res.status().json({
-            success:false,
-            message:"User Role cannot be verified, please try later"
-        })
-    }
-};
-
-//isAdmin
-
-exports.isAdmin =  async(req,res,next) => {
-    try{
-        
-        if(req.user.role !== "Admin")
-        {
-            return res.status(401).json({
-                success:false,
-                message:"This is a protected route for Admin"
-            })
-        }
-        next();
-
-    }catch(error)
-    {
-        return res.status().json({
-            success:false,
-            message:"User Role cannot be verified, please try later"
-        })
-    }
-};
-
-//isSuperAdmin
-
-exports.isSuperAdmin = async (req, res, next) => {
-    try {
-      if (req.user.role !== "SuperAdmin") {
-        return res.status(401).json({
-          success: false,
-          message: "This is a protected route for SuperAdmin",
-        });
-      }
-      next();
-    } catch (error) {
-      return res.status(500).json({
+    if (!token) {
+      return res.status(401).json({
         success: false,
-        message: "User Role cannot be verified, please try later",
+        message: "Token is missing",
       });
     }
-  };
+
+    try {
+      const decode = jwt.verify(token, process.env.JWT_SECRET);
+      // console.log("decode: ", decode);
+      req.user = decode;
+    } catch (error) {
+      return res.status(401).json({
+        success: false,
+        message: "token is invalid",
+      });
+    }
+    next();
+  } catch (error) {
+    return res.status(500).json({
+      success: false,
+      error: error.message,
+      message: "somthing went wrong while validating token",
+    });
+  }
+};
+
+// isViewer
+exports.isViewer = async (req, res, next) => {
+  try {
+    if (req.user.role !== "Viewer") {
+      return res.status(401).json({
+        success: false,
+        message: "This is a protected route for Viewer",
+      });
+    }
+    next();
+  } catch (error) {
+    return res.status(500).json({
+      success: false,
+      message: "User Role cannot be verified, please try later",
+    });
+  }
+};
+
+// isAdmin
+exports.isAdmin = async (req, res, next) => {
+  try {
+    if (req.user.role !== "Admin") {
+      return res.status(401).json({
+        success: false,
+        message: "This is a protected route for Admin",
+      });
+    }
+    next();
+  } catch (error) {
+    return res.status(500).json({
+      success: false,
+      message: "User Role cannot be verified, please try later",
+    });
+  }
+};
+
+// isSuperAdmin
+exports.isSuperAdmin = async (req, res, next) => {
+  try {
+    if (req.user.role !== "SuperAdmin") {
+      return res.status(401).json({
+        success: false,
+        message: "This is a protected route for SuperAdmin",
+      });
+    }
+    next();
+  } catch (error) {
+    return res.status(500).json({
+      success: false,
+      message: "User Role cannot be verified, please try later",
+    });
+  }
+};

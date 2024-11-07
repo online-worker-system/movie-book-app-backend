@@ -20,11 +20,11 @@ const cinemaSchema = new mongoose.Schema({
     ref: "City",
     required: true,
   },
-  adminDetailes:{
-    type:mongoose.Schema.Types.ObjectId,
-    ref:"User",
-    required:true
-  }
+  adminDetailes: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "User",
+    required: true,
+  },
 });
 
 

@@ -1,80 +1,71 @@
-const { assign } = require("nodemailer/lib/shared");
 const MovieShow = require("../models/MovieShow");
 const Screen = require("../models/Screen");
 const Seat = require("../models/Seat");
-const showSeatSchema=require("../models/ShowSeat");
+const showSeatSchema = require("../models/ShowSeat");
+const { assign } = require("nodemailer/lib/shared");
+
 exports.addShow = async (req, res) => {
   try {
-    const { showStart, showEnd, movieId, screenId,cinemaId } = req.body;
+    const { showStart, showEnd, movieId, cinemaId, screenId } = req.body;
 
     const findScreen = await MovieShow.find({ screenId: screenId });
-
-    console.log(findScreen);
+    console.log("findScreen: ", findScreen);
 
     if (findScreen.length === 0) {
       const newShow = await MovieShow.create({
         showStart,
         showEnd,
-        cinemaId,
         movieId,
-        isLive:false,
+        isLive: false,
+        cinemaId,
         screenId,
       });
 
       return res.status(200).json({
         success: true,
+        data: newShow,
         message: "New Show added successfully",
-        show: newShow,
       });
-    } 
+    }
 
-
-
-       let isExist=false;
-      findScreen.forEach((value) => {
-        const valueShowStart = new Date(value.showStart);
-        const inputShowStart = new Date(showStart);
-        if (valueShowStart.getTime() === inputShowStart.getTime()) {
-          isExist=true;
-        }
-      });
-
-      if(isExist)
-      {
-        return res.status(402).json({
-            success: false,
-            message: "Already one show at the same time",
-          });
+    let isExist = false;
+    findScreen.forEach((value) => {
+      const valueShowStart = new Date(value.showStart);
+      const inputShowStart = new Date(showStart);
+      if (valueShowStart.getTime() === inputShowStart.getTime()) {
+        isExist = true;
       }
-    
+    });
+
+    if (isExist) {
+      return res.status(402).json({
+        success: false,
+        message: "Already one show at the same time",
+      });
+    }
 
     const newShow = await MovieShow.create({
-        showStart,
-        showEnd,
-        movieId,
-        isLive:false,
-        screenId,
-      });
+      showStart,
+      showEnd,
+      movieId,
+      isLive: false,
+      cinemaId,
+      screenId,
+    });
 
-
-
-      return res.status(200).json({
-        success: true,
-        message: "New Show added successfully",
-        show: newShow,
-      });
+    return res.status(200).json({
+      success: true,
+      show: newShow,
+      message: "New Show added successfully",
+    });
   } catch (error) {
-    console.log(error);
-
     return res.status(500).json({
-        success:false,
-        message:"Somthing went wrong while adding show",
-        error:error
-    })
+      success: false,
+      error: error.message,
+      message: "Somthing went wrong while adding show",
+    });
   }
 };
-
-
 
 exports.doLiveShow = async (req, res) => {
   try {
@@ -85,22 +76,26 @@ exports.doLiveShow = async (req, res) => {
     if (!findShow || findShow.isLive) {
       return res.status(404).json({
         success: false,
-        message: "Show not found or already live. Please enter a correct ID.",
+        message: "Show not found please enter correct id",
       });
     }
 
-    await MovieShow.findByIdAndUpdate(findShow._id, { isLive: true }, { new: true });
+    await MovieShow.findByIdAndUpdate(
+      findShow._id,
+      { isLive: true },
+      { new: true }
+    );
 
     const findScreen = await Screen.findById(findShow.screenId);
 
     if (!findScreen) {
       return res.status(404).json({
         success: false,
-        message: "Screen not found for the specified show.",
+        message: "Screen is not found regarding to show",
       });
     }
 
-    const newSeatArray = [];
+    let newSeatArray = [];
     for (const value of findScreen.seats) {
       const newSeat = await showSeatSchema.create({
         seatId: value,
@@ -108,52 +103,27 @@ exports.doLiveShow = async (req, res) => {
         price: 200,
         status: "FREE",
       });
-      console.log(newSeat);
       newSeatArray.push(newSeat._id);
     }
+    console.log("newseat: ", newSeatArray);
+    const updatedshow = await MovieShow.findByIdAndUpdate(
+      findShow._id,
+      { showSeats: newSeatArray },
+      { new: true }
+    );
+    console.log("sjow: ", updatedshow);
 
-    console.log(newSeatArray);
-   
-    await MovieShow.findByIdAndUpdate(findShow._id, { showSeats: newSeatArray }, { new: true });
-
-    console.log(findShow);
+    console.log("finshsow: ", findShow);
 
     return res.status(200).json({
       success: true,
-      message: "Your show is live now.",
+      message: "Your show is live now",
     });
-
   } catch (error) {
-    console.log("Something went wrong while making the show live:", error);
     return res.status(500).json({
       success: false,
-      message: "Something went wrong while making the show live.",
       error: error.message,
+      message: "Somthing went wrong while live show",
     });
   }
 };
-
-
-exports.findShowByMovie = async (req,res) => {
-  try{
-
-    const {movieId} = req.body;
-
-    const findAllShows = await MovieShow.find({movieId:movieId});
-
-    return res.status(200).json({
-      success:true,
-      message:"All Shows fetched",
-      allShows:findAllShows
-    })
-
-  }catch(error)
-  {
-    console.log("omething went wrong while finding shows of particular movie",error);
-    return res.status(500).json({
-      success:false,
-      message:"Something went wrong while finding shows of particular movie",
-      error:error
-    })
-  }
-}
