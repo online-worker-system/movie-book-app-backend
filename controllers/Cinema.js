@@ -3,6 +3,7 @@ const Cinema = require("../models/Cinema");
 const Screen = require("../models/Screen");
 const City = require("../models/City");
 const Seat = require("../models/Seat");
+const MovieShow = require("../models/MovieShow");
 
 exports.addCinema = async (req, res) => {
   try {
@@ -140,6 +141,53 @@ exports.updateScreen = async (req, res) => {
       success: false,
       error: error.message,
       message: "Error while updating screen",
+    });
+  }
+};
+
+exports.getShowCinema = async (req, res) => {
+  try {
+    // fetch course details
+    const { movieId, cinemaId } = req.body;
+
+    // Find the MovieShow document that matches the movieId and isLive is true
+    const uniqueCinemas = await MovieShow.findOne({
+      movieId: movieId,
+      cinemaId: cinemaId,
+      isLive: true,
+    })
+      .populate({
+        path: "cinemaId",
+        model: "Cinema",
+        populate: {
+          path: "cityId",
+          model: "City",
+        },
+      })
+      .populate({
+        path: "showSeats",
+        model: "ShowSeat",
+        select: "seatId price status",
+      });
+
+    if (!uniqueCinemas) {
+      return res.status(404).json({
+        success: false,
+        message: "No live movie show found for this movie.",
+      });
+    }
+
+    // return response
+    return res.status(200).json({
+      success: true,
+      data: uniqueCinemas,
+      message: "Show Cinema details fetched successfully",
+    });
+  } catch (error) {
+    return res.status(500).json({
+      success: false,
+      error: error.message,
+      message: "Unable to fetch Show Cinema, please try again",
     });
   }
 };
