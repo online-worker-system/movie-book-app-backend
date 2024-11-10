@@ -27,8 +27,6 @@ exports.addCinema = async (req, res) => {
     }
 
     const adminDetailes = req.user.id;
-    console.log("admindetailes:", adminDetailes, "user: ", req.user);
-
     const newCinema = await Cinema.create({
       cinemaName,
       pincode,
@@ -66,7 +64,6 @@ exports.addCinema = async (req, res) => {
 exports.findCinemaDetailes = async (req, res) => {
   try {
     const adminId = req.user.id;
-    console.log("adminId: ", adminId);
 
     const findCinema = await Cinema.find({
       adminDetailes: adminId,
@@ -192,7 +189,7 @@ exports.getShowCinema = async (req, res) => {
         select: "seatId price status",
       });
 
-    if (!uniqueCinemas) {
+    if (!uniqueCinemas || uniqueCinemas.length === 0) {
       return res.status(404).json({
         success: false,
         message: "No live movie show found for this movie.",

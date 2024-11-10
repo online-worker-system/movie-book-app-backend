@@ -134,7 +134,6 @@ exports.doLiveShow = async (req, res) => {
       { showSeats: newSeatArray },
       { new: true }
     );
-    console.log("show: ", updatedshow);
 
     return res.status(200).json({
       success: true,
