@@ -75,7 +75,7 @@ exports.getMovieCinema = async (req, res) => {
         select: "seatId price status",
       });
 
-    if (!uniqueCinemas) {
+    if (!uniqueCinemas || uniqueCinemas.length === 0) {
       return res.status(404).json({
         success: false,
         message: "No live movie show found for this movie.",
@@ -89,6 +89,7 @@ exports.getMovieCinema = async (req, res) => {
         cinemas: {
           showStart: show.showStart,
           showEnd: show.showEnd,
+          timing: show.timing,
           cinemaId: show.cinemaId._id,
           cinemaName: show.cinemaId.cinemaName,
           screens: show.cinemaId.screens,
@@ -107,8 +108,6 @@ exports.getMovieCinema = async (req, res) => {
     }
 
     const finalData = {
-      showStart: tempData[0].showStart,
-      showEnd: tempData[0].showEnd,
       movieId: tempData[0].movieId,
       isLive: tempData[0].isLive,
       cinemas: arr,

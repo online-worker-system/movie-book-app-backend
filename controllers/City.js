@@ -10,7 +10,7 @@ exports.addCity = async (req, res) => {
     if (findCity) {
       return res.status(401).json({
         success: false,
-        message: "City already exist",
+        message: "City Name already exist",
       });
     }
 
