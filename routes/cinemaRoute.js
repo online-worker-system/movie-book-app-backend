@@ -14,6 +14,6 @@ router.post("/addCity", auth, isSuperAdmin, addCity);
 router.post("/addCinema", auth, isAdmin, addCinema);
 router.post("/updateScreen", auth, isAdmin, updateScreen);
 router.get("/getCinemaDetailes", auth, isAdmin, findCinemaDetailes);
-router.post("/getShowCinema", auth, getShowCinema);
+router.post("/getShowCinema", getShowCinema);
 
 module.exports = router;
