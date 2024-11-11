@@ -1,23 +1,37 @@
 const MovieShow = require("../models/MovieShow");
 const Screen = require("../models/Screen");
+const Movie = require("../models/Movie");
+const Cinema = require("../models/Cinema");
 const Seat = require("../models/Seat");
 const showSeatSchema = require("../models/ShowSeat");
 const { assign } = require("nodemailer/lib/shared");
 
 exports.addShow = async (req, res) => {
   try {
-    const { showStart, showEnd, movieId, cinemaId, screenId } = req.body;
+    const { movieId, cinemaId, showStart, showEnd, timing, screenId } =
+      req.body;
+
+    const movie = await Movie.findById(movieId);
+    const cinema = await Cinema.findById(cinemaId);
+    const screen = await Screen.findById(screenId);
+
+    if (!movie || !cinema || !screen) {
+      return res.status(200).json({
+        success: false,
+        message: "Please enter valid movieId or cinemaId or screenId",
+      });
+    }
 
     const findScreen = await MovieShow.find({ screenId: screenId });
-    console.log("findScreen: ", findScreen);
 
     if (findScreen.length === 0) {
       const newShow = await MovieShow.create({
+        movieId,
+        cinemaId,
         showStart,
         showEnd,
-        movieId,
         isLive: false,
-        cinemaId,
+        timing,
         screenId,
       });
 
@@ -29,27 +43,36 @@ exports.addShow = async (req, res) => {
     }
 
     let isExist = false;
-    findScreen.forEach((value) => {
+    for (const value of findScreen) {
       const valueShowStart = new Date(value.showStart);
       const inputShowStart = new Date(showStart);
-      if (valueShowStart.getTime() === inputShowStart.getTime()) {
+      const valueShowEnd = new Date(value.showEnd);
+      const inputShowEnd = new Date(showEnd);
+      const valueShowTiming = value.timing;
+
+      if (
+        valueShowTiming === timing &&
+        (valueShowStart.getTime() === inputShowStart.getTime() ||
+          valueShowEnd.getTime() === inputShowEnd.getTime())
+      ) {
         isExist = true;
       }
-    });
 
-    if (isExist) {
-      return res.status(402).json({
-        success: false,
-        message: "Already one show at the same time",
-      });
+      if (isExist) {
+        return res.status(500).json({
+          success: false,
+          message: "Already one show at the same time",
+        });
+      }
     }
 
     const newShow = await MovieShow.create({
+      movieId,
+      cinemaId,
       showStart,
       showEnd,
-      movieId,
       isLive: false,
-      cinemaId,
+      timing,
       screenId,
     });
 
@@ -76,7 +99,8 @@ exports.doLiveShow = async (req, res) => {
     if (!findShow || findShow.isLive) {
       return res.status(404).json({
         success: false,
-        message: "Show not found please enter correct id",
+        message:
+          "Show not found please enter correct id or show is already live.",
       });
     }
 
@@ -100,20 +124,16 @@ exports.doLiveShow = async (req, res) => {
       const newSeat = await showSeatSchema.create({
         seatId: value,
         showId: showId,
-        price: 200,
-        status: "FREE",
+        status: "Available",
       });
       newSeatArray.push(newSeat._id);
     }
-    console.log("newseat: ", newSeatArray);
+
     const updatedshow = await MovieShow.findByIdAndUpdate(
       findShow._id,
       { showSeats: newSeatArray },
       { new: true }
     );
-    console.log("sjow: ", updatedshow);
-
-    console.log("finshsow: ", findShow);
 
     return res.status(200).json({
       success: true,

@@ -17,9 +17,9 @@ module.exports = router;
 const { getAllMovies, getMovieDetails, getMovieCinema, addMovie, updateMovie, deleteMovie } = require("../controllers/Movie");
 const { auth, isSuperAdmin } = require("../middlewares/auth");
 
-router.get("/getAllMovies", auth, getAllMovies);
-router.post("/getMovieDetails", auth, getMovieDetails);
-router.post("/getMovieCinema", auth, getMovieCinema);
+router.get("/getAllMovies", getAllMovies);
+router.post("/getMovieDetails", getMovieDetails);
+router.post("/getMovieCinema", getMovieCinema);
 router.post("/addMovie", auth, isSuperAdmin, addMovie);
 router.put("/updateMovie", auth, isSuperAdmin, updateMovie);
 router.delete("/deleteMovie", auth, isSuperAdmin, deleteMovie);

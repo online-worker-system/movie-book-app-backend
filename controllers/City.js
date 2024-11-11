@@ -10,7 +10,7 @@ exports.addCity = async (req, res) => {
     if (findCity) {
       return res.status(401).json({
         success: false,
-        message: "City already exist",
+        message: "City Name already exist",
       });
     }
 
@@ -19,7 +19,6 @@ exports.addCity = async (req, res) => {
     const newCity = await City.create({
       cityName: changeCity,
     });
-    console.log("newcity: ", newCity);
 
     return res.status(200).json({
       success: true,

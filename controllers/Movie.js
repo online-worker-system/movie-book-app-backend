@@ -62,6 +62,10 @@ exports.getMovieCinema = async (req, res) => {
       isLive: true,
     })
       .populate({
+        path: "movieId",
+        model: "Movie",
+      })
+      .populate({
         path: "cinemaId",
         model: "Cinema",
         populate: {
@@ -75,7 +79,7 @@ exports.getMovieCinema = async (req, res) => {
         select: "seatId price status",
       });
 
-    if (!uniqueCinemas) {
+    if (!uniqueCinemas || uniqueCinemas.length === 0) {
       return res.status(404).json({
         success: false,
         message: "No live movie show found for this movie.",
@@ -84,11 +88,12 @@ exports.getMovieCinema = async (req, res) => {
 
     const tempData = uniqueCinemas.map((show) => {
       return {
-        movieId: show.movieId,
+        movieDetails: show.movieId,
         isLive: show.isLive,
         cinemas: {
           showStart: show.showStart,
           showEnd: show.showEnd,
+          timing: show.timing,
           cinemaId: show.cinemaId._id,
           cinemaName: show.cinemaId.cinemaName,
           screens: show.cinemaId.screens,
@@ -107,9 +112,7 @@ exports.getMovieCinema = async (req, res) => {
     }
 
     const finalData = {
-      showStart: tempData[0].showStart,
-      showEnd: tempData[0].showEnd,
-      movieId: tempData[0].movieId,
+      movieDetails: tempData[0].movieDetails,
       isLive: tempData[0].isLive,
       cinemas: arr,
     };

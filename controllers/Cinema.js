@@ -1,5 +1,6 @@
 const User = require("../models/User");
 const Cinema = require("../models/Cinema");
+const Movie = require("../models/Movie");
 const Screen = require("../models/Screen");
 const City = require("../models/City");
 const Seat = require("../models/Seat");
@@ -26,9 +27,6 @@ exports.addCinema = async (req, res) => {
     }
 
     const adminDetailes = req.user.id;
-    console.log("admindetailes:", adminDetailes, "user: ", req.user);
-    //token mai se userid ko admin deftailes mai dalna hai
-
     const newCinema = await Cinema.create({
       cinemaName,
       pincode,
@@ -66,7 +64,6 @@ exports.addCinema = async (req, res) => {
 exports.findCinemaDetailes = async (req, res) => {
   try {
     const adminId = req.user.id;
-    console.log("adminId: ", adminId);
 
     const findCinema = await Cinema.find({
       adminDetailes: adminId,
@@ -96,6 +93,15 @@ exports.findCinemaDetailes = async (req, res) => {
 exports.updateScreen = async (req, res) => {
   try {
     const { regular, vip, bolcony, screenId } = req.body;
+
+    const screen = await Screen.findById(screenId);
+    if (!screen) {
+      return res.status(200).json({
+        success: false,
+        message: "Screen not found",
+      });
+    }
+
     const seatIds = [];
 
     // Create seats for 'regular' category and add their IDs to seatIds
@@ -103,15 +109,7 @@ exports.updateScreen = async (req, res) => {
       const newSeat = await Seat.create({
         seatType: regular.name,
         seatNumber: i + 1,
-      });
-      seatIds.push(newSeat._id);
-    }
-
-    // Create seats for 'vip' category and add their IDs to seatIds
-    for (let i = 0; i < vip.seat; i++) {
-      const newSeat = await Seat.create({
-        seatType: vip.name,
-        seatNumber: i + 1,
+        seatPrice: regular.price,
       });
       seatIds.push(newSeat._id);
     }
@@ -121,6 +119,17 @@ exports.updateScreen = async (req, res) => {
       const newSeat = await Seat.create({
         seatType: bolcony.name,
         seatNumber: i + 1,
+        seatPrice: bolcony.price,
+      });
+      seatIds.push(newSeat._id);
+    }
+
+    // Create seats for 'vip' category and add their IDs to seatIds
+    for (let i = 0; i < vip.seat; i++) {
+      const newSeat = await Seat.create({
+        seatType: vip.name,
+        seatNumber: i + 1,
+        seatPrice: vip.price,
       });
       seatIds.push(newSeat._id);
     }
@@ -150,8 +159,18 @@ exports.getShowCinema = async (req, res) => {
     // fetch course details
     const { movieId, cinemaId } = req.body;
 
+    const movie = await Movie.findById(movieId);
+    const cinema = await Cinema.findById(cinemaId);
+
+    if (!movie || !cinema) {
+      return res.status(404).json({
+        success: false,
+        message: "MovieId or CinemaId not found!",
+      });
+    }
+
     // Find the MovieShow document that matches the movieId and isLive is true
-    const uniqueCinemas = await MovieShow.findOne({
+    const uniqueCinemas = await MovieShow.find({
       movieId: movieId,
       cinemaId: cinemaId,
       isLive: true,
@@ -170,7 +189,7 @@ exports.getShowCinema = async (req, res) => {
         select: "seatId price status",
       });
 
-    if (!uniqueCinemas) {
+    if (!uniqueCinemas || uniqueCinemas.length === 0) {
       return res.status(404).json({
         success: false,
         message: "No live movie show found for this movie.",
