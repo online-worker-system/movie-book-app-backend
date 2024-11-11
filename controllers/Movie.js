@@ -62,6 +62,10 @@ exports.getMovieCinema = async (req, res) => {
       isLive: true,
     })
       .populate({
+        path: "movieId",
+        model: "Movie",
+      })
+      .populate({
         path: "cinemaId",
         model: "Cinema",
         populate: {
@@ -84,7 +88,7 @@ exports.getMovieCinema = async (req, res) => {
 
     const tempData = uniqueCinemas.map((show) => {
       return {
-        movieId: show.movieId,
+        movieDetails: show.movieId,
         isLive: show.isLive,
         cinemas: {
           showStart: show.showStart,
@@ -108,7 +112,7 @@ exports.getMovieCinema = async (req, res) => {
     }
 
     const finalData = {
-      movieId: tempData[0].movieId,
+      movieDetails: tempData[0].movieDetails,
       isLive: tempData[0].isLive,
       cinemas: arr,
     };
