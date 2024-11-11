@@ -1,3 +1,4 @@
+
 const express = require("express");
 const router = express.Router();
 
@@ -17,3 +18,4 @@ router.get("/getCinemaDetailes", auth, isAdmin, findCinemaDetailes);
 router.post("/getShowCinema", getShowCinema);
 
 module.exports = router;
+

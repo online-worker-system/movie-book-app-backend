@@ -27,4 +27,7 @@ const cinemaSchema = new mongoose.Schema({
   },
 });
 
+
+
+
 module.exports = mongoose.model("Cinema", cinemaSchema);
