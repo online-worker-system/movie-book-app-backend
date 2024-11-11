@@ -1,6 +1,6 @@
 const mongoose = require("mongoose");
 
-const SeatType = ["REGULAR", "VIP", "BALCONY"]; 
+const SeatType = ["REGULAR", "VIP", "BALCONY"];
 
 const seatSchema = new mongoose.Schema({
   // screenId: {
@@ -14,7 +14,7 @@ const seatSchema = new mongoose.Schema({
     required: true,
   },
   seatNumber: {
-    type:Number,
+    type: Number,
     required: true,
   },
   seatPrice: {
