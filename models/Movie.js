@@ -1,7 +1,7 @@
 const mongoose = require("mongoose");
 
-const Genre = ["Action", "Comedy", "Drama", "Thriller", "Sci-Fi"];
-const Language = ["English", "Hindi", "Spanish", "French"];
+const Genre = ["Action", "Adventure", "Comedy", "Drama", "Thriller", "Sci-Fi"];
+const Language = ["English", "Hindi", "Telugu", "Tamil", "Kannada"];
 
 const movieSchema = new mongoose.Schema({
   movieName: {

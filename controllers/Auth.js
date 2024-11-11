@@ -25,7 +25,6 @@ exports.sendOTP = async (req, res) => {
       lowerCaseAlphabets: false,
       specialChars: false,
     });
-    console.log("OTP generated: ", otp);
 
     const result = await OTP.findOne({ otp: otp });
     while (result) {
@@ -40,8 +39,7 @@ exports.sendOTP = async (req, res) => {
 
     // create an entry for OTP
     const otpPayload = { email, otp };
-    const otpBody = await OTP.create(otpPayload);
-    console.log("otpBody: ", otpBody);
+    await OTP.create(otpPayload);
 
     return res.status(200).json({
       success: true,
@@ -107,8 +105,6 @@ exports.signup = async (req, res) => {
     const recentOtp = await OTP.find({ email })
       .sort({ createdAt: -1 })
       .limit(1);
-
-    console.log("recent Otp is : ", recentOtp);
 
     // validate OTP
     if (recentOtp.length === 0) {

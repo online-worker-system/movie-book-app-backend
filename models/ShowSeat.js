@@ -1,6 +1,6 @@
 const mongoose = require("mongoose");
 
-const SeatStatus = ["FREE", "OCCUPIED", "LOCKED"];
+const SeatStatus = ["Available", "Booked", "Reserved"];
 
 const showSeatSchema = new mongoose.Schema({
   seatId: {
@@ -11,10 +11,6 @@ const showSeatSchema = new mongoose.Schema({
   showId: {
     type: mongoose.Schema.Types.ObjectId,
     ref: "MovieShow",
-    required: true,
-  },
-  price: {
-    type: Number,
     required: true,
   },
   status: {

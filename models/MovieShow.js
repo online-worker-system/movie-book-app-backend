@@ -1,14 +1,6 @@
 const mongoose = require("mongoose");
 
 const movieShowSchema = new mongoose.Schema({
-  showStart: {
-    type: Date,
-    required: true,
-  },
-  showEnd: {
-    type: Date,
-    required: true,
-  },
   movieId: {
     type: mongoose.Schema.Types.ObjectId,
     ref: "Movie",
@@ -19,13 +11,27 @@ const movieShowSchema = new mongoose.Schema({
     ref: "Cinema",
     required: true,
   },
-  screenId: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: "Screen",
+  showStart: {
+    type: Date,
+    required: true,
+  },
+  showEnd: {
+    type: Date,
     required: true,
   },
   isLive: {
     type: Boolean,
+    required: true,
+  },
+  timing: {
+    type: String,
+    enum: ["9-12am", "3-6pm", "9-12pm"],
+    required: true,
+  },
+  screenId: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "Screen",
+    required: true,
   },
   showSeats: [
     {
