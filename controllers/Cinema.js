@@ -187,6 +187,10 @@ exports.getShowCinema = async (req, res) => {
         path: "showSeats",
         model: "ShowSeat",
         select: "seatId price status",
+        populate: {
+          path: "seatId",
+          model: "Seat",
+        },
       });
 
     if (!uniqueCinemas || uniqueCinemas.length === 0) {
