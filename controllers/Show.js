@@ -2,9 +2,7 @@ const MovieShow = require("../models/MovieShow");
 const Screen = require("../models/Screen");
 const Movie = require("../models/Movie");
 const Cinema = require("../models/Cinema");
-const Seat = require("../models/Seat");
-const showSeatSchema = require("../models/ShowSeat");
-const { assign } = require("nodemailer/lib/shared");
+const ShowSeatSchema = require("../models/ShowSeat");
 
 exports.addShow = async (req, res) => {
   try {
@@ -95,7 +93,6 @@ exports.doLiveShow = async (req, res) => {
     const { showId } = req.body;
 
     const findShow = await MovieShow.findById(showId);
-
     if (!findShow || findShow.isLive) {
       return res.status(404).json({
         success: false,
@@ -121,7 +118,7 @@ exports.doLiveShow = async (req, res) => {
 
     let newSeatArray = [];
     for (const value of findScreen.seats) {
-      const newSeat = await showSeatSchema.create({
+      const newSeat = await ShowSeatSchema.create({
         seatId: value,
         showId: showId,
         status: "Available",
@@ -144,6 +141,36 @@ exports.doLiveShow = async (req, res) => {
       success: false,
       error: error.message,
       message: "Somthing went wrong while live show",
+    });
+  }
+};
+
+exports.getUnliveShows = async (req, res) => {
+  try {
+    const adminId = req.user.id;
+
+    const findShows = await MovieShow.find({
+      adminId: adminId,
+      isLive: false,
+    });
+
+    if (!findShows || findShows.isLive) {
+      return res.status(404).json({
+        success: false,
+        message: "Shows not found or shows are already live.",
+      });
+    }
+
+    return res.status(200).json({
+      success: true,
+      data: findShows,
+      message: "Shows fetched successfully",
+    });
+  } catch (error) {
+    return res.status(500).json({
+      success: false,
+      error: error.message,
+      message: "Somthing went wrong while getting unlive shows",
     });
   }
 };

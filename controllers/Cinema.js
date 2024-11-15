@@ -1,4 +1,3 @@
-const User = require("../models/User");
 const Cinema = require("../models/Cinema");
 const Movie = require("../models/Movie");
 const Screen = require("../models/Screen");
