@@ -8,7 +8,7 @@ exports.addCity = async (req, res) => {
     // check city existance
     const findCity = await City.findOne({ cityName });
     if (findCity) {
-      return res.status(401).json({
+      return res.status(400).json({
         success: false,
         message: "City Name already exist",
       });

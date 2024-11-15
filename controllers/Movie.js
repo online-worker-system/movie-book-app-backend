@@ -30,7 +30,7 @@ exports.getMovieDetails = async (req, res) => {
     // validation
     const movieDetails = await Movie.findById(movieId);
     if (!movieDetails) {
-      return res.status(400).json({
+      return res.status(404).json({
         success: false,
         message: `Could not find movie with id: ${movieId}`,
       });
@@ -157,7 +157,7 @@ exports.addMovie = async (req, res) => {
       !supportingLanguages ||
       !thumbnail
     ) {
-      return res.status(404).json({
+      return res.status(400).json({
         success: false,
         message: "Please enter all the details",
       });

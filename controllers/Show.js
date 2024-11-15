@@ -16,7 +16,7 @@ exports.addShow = async (req, res) => {
     const screen = await Screen.findById(screenId);
 
     if (!movie || !cinema || !screen) {
-      return res.status(200).json({
+      return res.status(404).json({
         success: false,
         message: "Please enter valid movieId or cinemaId or screenId",
       });
@@ -59,7 +59,7 @@ exports.addShow = async (req, res) => {
       }
 
       if (isExist) {
-        return res.status(500).json({
+        return res.status(400).json({
           success: false,
           message: "Already one show at the same time",
         });
