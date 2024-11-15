@@ -12,7 +12,7 @@ exports.addCinema = async (req, res) => {
     const { cinemaName, pincode, cityId } = req.body;
 
     if (!cinemaName || !pincode || !cityId) {
-      return res.status(402).json({
+      return res.status(400).json({
         success: false,
         message: "Please enter all the fields",
       });
@@ -70,7 +70,7 @@ exports.findCinemaDetailes = async (req, res) => {
     });
 
     if (!findCinema) {
-      return res.status(200).json({
+      return res.status(404).json({
         success: false,
         message: "Cinema not found",
       });
@@ -96,7 +96,7 @@ exports.updateScreen = async (req, res) => {
 
     const screen = await Screen.findById(screenId);
     if (!screen) {
-      return res.status(200).json({
+      return res.status(404).json({
         success: false,
         message: "Screen not found",
       });
