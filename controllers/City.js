@@ -32,3 +32,27 @@ exports.addCity = async (req, res) => {
     });
   }
 };
+
+exports.getCities = async (req, res) => {
+  try {
+    const cities = await City.find();
+    if (!cities) {
+      return res.status(400).json({
+        success: false,
+        message: "There are no cities",
+      });
+    }
+
+    return res.status(200).json({
+      success: true,
+      data: cities,
+      message: "Cities fetched Successfully",
+    });
+  } catch (error) {
+    return res.status(500).json({
+      success: false,
+      error: error.message,
+      message: "Error while fetching cities",
+    });
+  }
+};
