@@ -135,6 +135,10 @@ exports.getMovieCinema = async (req, res) => {
 exports.addMovie = async (req, res) => {
   try {
     // fetch data
+
+    console.log(req.body);
+
+
     const {
       movieName,
       releaseDate,
@@ -144,6 +148,7 @@ exports.addMovie = async (req, res) => {
       supportingLanguages,
     } = req.body;
 
+    console.log(genres)
     // get thumbnail image
     const thumbnail = req.files.thumbnailImage;
 

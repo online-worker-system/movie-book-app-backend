@@ -5,10 +5,16 @@ const jwt = require("jsonwebtoken");
 exports.auth = async (req, res, next) => {
   try {
     // extract token
+
+  
+
+
     const token =
       req.cookies.token ||
       req.body.token ||
-      req.header("Authorization").replace("Bearer", "");
+      req.header("Authorization").replace("Bearer ","");
+
+      console.log("token :",token)
 
     if (!token) {
       return res.status(401).json({
@@ -18,7 +24,9 @@ exports.auth = async (req, res, next) => {
     }
 
     try {
-      const decode = jwt.verify(token, process.env.JWT_SECRET);
+
+      console.log(process.env.JWT_SECRET)
+      const decode = jwt.verify(token,process.env.JWT_SECRET);
       // console.log("decode: ", decode);
       req.user = decode;
     } catch (error) {

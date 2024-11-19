@@ -12,7 +12,7 @@ const PORT = process.env.PORT || 5000;
 const userRoutes = require("./routes/userRoute");
 const cinemaRoutes = require("./routes/cinemaRoute");
 const movieRoutes = require("./routes/movieRoute");
-const showRoutes = require("./routes/showRoute");
+const showRoutes = require("./routes/ShowRoutes");
 const paymentRoutes = require("./routes/paymentRoute");
 
 // middleware setup

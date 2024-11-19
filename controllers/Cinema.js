@@ -159,6 +159,8 @@ exports.getShowCinema = async (req, res) => {
     // fetch course details
     const { movieId, cinemaId } = req.body;
 
+    console.log(movieId,cinemaId)
+
     const movie = await Movie.findById(movieId);
     const cinema = await Cinema.findById(cinemaId);
 
@@ -187,6 +189,10 @@ exports.getShowCinema = async (req, res) => {
         path: "showSeats",
         model: "ShowSeat",
         select: "seatId price status",
+        populate: {
+          path: "seatId",
+          model: "Seat", 
+        },
       });
 
     if (!uniqueCinemas || uniqueCinemas.length === 0) {
