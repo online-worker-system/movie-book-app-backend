@@ -1,5 +1,6 @@
 const mongoose = require("mongoose");
 
+
 const BookingStatus = ["BOOKED", "CANCELLED"];
 
 const bookingSchema = new mongoose.Schema({
@@ -23,9 +24,12 @@ const bookingSchema = new mongoose.Schema({
     type: Number,
     required: true,
   },
-  txnId: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: "Transaction",
+  isUsed:{
+    type:Boolean,
+    default:false 
+  },
+  qrImage:{
+    type:String,
   },
   userId: {
     type: mongoose.Schema.Types.ObjectId,

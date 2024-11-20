@@ -24,10 +24,12 @@ const userSchema = new mongoose.Schema({
     enum: ["SuperAdmin", "Admin", "Viewer"],
     required: true,
   },
-  booking:{
-    type: mongoose.Schema.Types.ObjectId,
-    ref: "Booking",
-  }
+  booking:[
+    {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Booking",
+    }
+  ]
 });
 
 module.exports = mongoose.model("User", userSchema);

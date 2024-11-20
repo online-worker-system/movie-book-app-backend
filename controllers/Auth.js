@@ -78,7 +78,7 @@ exports.signup = async (req, res) => {
       !contactNumber ||
       !otp
     ) {
-      return res.status(403).json({
+      return res.status(400).json({
         success: false,
         message: "All fields are required",
       });
@@ -108,7 +108,7 @@ exports.signup = async (req, res) => {
 
     // validate OTP
     if (recentOtp.length === 0) {
-      return res.status(400).json({
+      return res.status(404).json({
         success: false,
         message: "OTP not found",
       });
@@ -154,7 +154,7 @@ exports.login = async (req, res) => {
 
     // validation data
     if (!email || !password) {
-      return res.status(403).json({
+      return res.status(400).json({
         success: false,
         message: "All fields are required, please try later",
       });

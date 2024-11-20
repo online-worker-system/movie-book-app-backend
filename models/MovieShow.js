@@ -11,6 +11,11 @@ const movieShowSchema = new mongoose.Schema({
     ref: "Cinema",
     required: true,
   },
+  adminId: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "User",
+    required: true,
+  },
   showStart: {
     type: Date,
     required: true,

@@ -12,8 +12,9 @@ const PORT = process.env.PORT || 5000;
 const userRoutes = require("./routes/userRoute");
 const cinemaRoutes = require("./routes/cinemaRoute");
 const movieRoutes = require("./routes/movieRoute");
-const showRoutes = require("./routes/ShowRoutes");
+const showRoutes = require("./routes/showRoute");
 const paymentRoutes = require("./routes/paymentRoute");
+const bookingRoutes= require("./routes/bookingRoute");
 
 // middleware setup
 app.use(cors());
@@ -36,7 +37,7 @@ app.use("/api/v1/cinema", cinemaRoutes);
 app.use("/api/v1/movie", movieRoutes);
 app.use("/api/v1/show", showRoutes);
 app.use("/api/v1/payment", paymentRoutes);
-
+app.use("/api/v1/booking",bookingRoutes)
 // start server
 app.listen(PORT, () => console.log(`Server is now running on port ${PORT}`));
 

@@ -8,15 +8,17 @@ const { instance } = require("../config/razorpay");
 const Show = require("../models/MovieShow");
 const ShowSeat = require("../models/ShowSeat");
 const { compareSync } = require("bcrypt");
+const MovieShow = require("../models/MovieShow");
 // Capture Payment
 
 exports.capturePayment = async (req, res) => {
   try {
     const { showId, movieId, cinemaId, screenId, seatsBook } = req.body;
-    console.log(req.body);
+   
     const userId = req.user.id;
 
-    console.log("HEllo")
+    console.log("idhar aayaya")
+
     // Validate booking ID
     const show = await Show.findById(showId).populate("showSeats");
 
@@ -30,9 +32,9 @@ exports.capturePayment = async (req, res) => {
     const findSeats = await Promise.all(
       seatsBook.map(async (seatId) => {
 
-        console.log(seatId)
+    
         const findSeat = await ShowSeat.findById(seatId).populate("seatId") // Use .lean() for plain objects
-        console.log("findSeat object:", findSeat);
+       
 
         if (findSeat.status !== "FREE" && findSeat.status !== "Available") {
           return res.status(400).json({
@@ -51,24 +53,24 @@ exports.capturePayment = async (req, res) => {
 
     // Using forEach to sum up the price
     findSeats.forEach((seat) => {
-      if (seat && typeof seat.price === 'number' && !isNaN(seat.price)) {
-        console.log("Price of seat:", seat.price);
-        amount += seat.price; // Adding price if it's valid
+      if (seat && typeof seat.seatId.seatPrice === 'number' && !isNaN(seat.seatId.seatPrice)) {
+        console.log("Price of seat:", seat.seatId.seatPrice);
+        amount += seat.seatId.seatPrice; // Adding price if it's valid
       } else {
         console.log("Invalid price for seat:", seat);
       }
     });
 
-    console.log("Total Amount:", amount);
+ 
 
     // Razorpay order creation options
     const options = {
       amount: amount * 100, // Convert to smallest currency unit (paise for INR)
       currency: "INR",
-      receipt: Math.random(Date.now()).toString(), // Generate a random receipt ID
+      receipt: Math.random(Date.now()).toString(),// Generate a random receipt ID
+     
     };
 
-    console.log("Order options:", options);
 
     try {
       const paymentResponse = await instance.orders.create(options);
@@ -76,6 +78,8 @@ exports.capturePayment = async (req, res) => {
       return res.status(200).json({
         success: true,
         data: paymentResponse,
+        showId,
+        seatsBook,
         message: "Payment initiated successfully",
       });
     } catch (err) {
@@ -97,14 +101,17 @@ exports.capturePayment = async (req, res) => {
 
 
 // Verify Payment Signature
-exports.verifySignature = async (req, res) => {
+exports.verifySignature = async (req, res,next) => {
   const {
     razorpay_order_id,
     razorpay_payment_id,
     razorpay_signature,
-    bookingId,
+    showId,
+    seatsForBook,
+    totalAmount
   } = req.body;
 
+  
   const body = razorpay_order_id + "|" + razorpay_payment_id;
   const expectedSignature = crypto
     .createHmac("sha256", process.env.RAZORPAY_SECRET)
@@ -118,38 +125,37 @@ exports.verifySignature = async (req, res) => {
     });
   }
 
-  try {
-    // Update booking and create transaction
-    const booking = await Booking.findByIdAndUpdate(
-      bookingId,
-      { status: "BOOKED" },
-      { new: true }
-    );
 
-    if (!booking) {
-      return res.status(404).json({
-        success: false,
-        message: "Booking not found",
+   try {
+    // Update booking and create transaction
+    const movieShow = await MovieShow.findById(showId);
+    if (!movieShow) {
+      console.log("Movie show not found");
+      return res.status(401).json({
+        success:false,
+        message:"movie not found"
       });
     }
 
-    const transaction = new Transaction({
-      txnId: Math.floor(100000 + Math.random() * 900000), // Random 6-digit txnId
-      referenceId: booking._id,
-      status: "SUCCESS",
-      amount: booking.totalAmount,
-    });
+    // 2. Iterate over the seatsForBook and update status for each ShowSeat
+    for (let seatId of seatsForBook) {
+      const seat = await ShowSeat.findById(seatId);
+      if (!seat) {
+        console.log(`Seat with ID ${seatId} not found`);
+        continue; // Skip to the next seat if the current one is not found
+      }
+      
+      // Update the seat's status to "BOOKED"
+      seat.status = "Booked";
+      await seat.save();
+      
+    }
+ 
 
-    await transaction.save();
 
-    // Update booking with transaction ID
-    booking.txnId = transaction._id;
-    await booking.save();
+    next();
 
-    return res.status(200).json({
-      success: true,
-      message: "Payment verified and booking confirmed",
-    });
+   
   } catch (err) {
     return res.status(500).json({
       success: false,
