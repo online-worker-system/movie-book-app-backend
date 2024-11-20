@@ -12,7 +12,12 @@ const http = require("http");
 const { Server } = require("socket.io");
 
 // middleware setup
-app.use(cors());
+app.use(
+  cors({
+    origin: "http://localhost:3000",
+    methods: ["GET", "POST", "PUT", "DELETE"],
+  })
+);
 app.use(express.json());
 app.use(cookieParser());
 app.use(
@@ -25,7 +30,10 @@ app.use(
 // Create HTTP server and initialize Socket.IO
 const server = http.createServer(app);
 const io = new Server(server, {
-  cors: true,
+  cors: {
+    origin: "http://localhost:3000",
+    methods: ["GET", "POST", "PUT", "DELETE"],
+  },
 });
 
 // connections
