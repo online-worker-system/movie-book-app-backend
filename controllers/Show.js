@@ -6,6 +6,7 @@ const ShowSeat = require("../models/ShowSeat");
 
 exports.addShow = async (req, res) => {
   try {
+    const adminId = req.user.id;
     const { movieId, cinemaId, showStart, showEnd, timing, screenId } =
       req.body;
 
@@ -28,6 +29,7 @@ exports.addShow = async (req, res) => {
         cinemaId,
         showStart,
         showEnd,
+        adminId,
         isLive: false,
         timing,
         screenId,
@@ -134,6 +136,7 @@ exports.doLiveShow = async (req, res) => {
 
     return res.status(200).json({
       success: true,
+      newSeatArray,
       message: "Your show is live now",
     });
   } catch (error) {
