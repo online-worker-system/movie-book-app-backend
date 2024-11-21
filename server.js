@@ -36,7 +36,7 @@ const io = new Server(server, {
     methods: ["GET", "POST", "PUT", "DELETE"],
     credentials: true, // Allow cookies or headers like Authorization
   },
-  transports: ["polling"], // Fallback to polling
+  transports: ["websocket", "polling"], // Try WebSocket first, then fallback to polling
 });
 
 // connections
