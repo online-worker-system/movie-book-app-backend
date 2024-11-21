@@ -9,13 +9,28 @@ const {
 const { auth, isViewer } = require("../middlewares/auth");
 const { bookShow } = require("../controllers/Booking");
 
-router.post("/capturePayment", auth, isViewer, capturePayment);
-router.post("/verifyPayment", auth, isViewer, verifySignature, bookShow);
-// router.post(
-//   "/sendPaymentSuccessEmail",
-//   auth,
-//   isViewer,
-//   sendPaymentSuccessEmail
-// );
+module.exports = (io) => {
+  // Middleware to attach io to req
+  const attachIO = (req, res, next) => {
+    req.io = io; // Attach io instance to req object
+    next();
+  };
 
-module.exports = router;
+  router.post("/capturePayment", auth, isViewer, capturePayment);
+  router.post(
+    "/verifyPayment",
+    auth,
+    isViewer,
+    attachIO, // Attach io before calling verifySignature
+    verifySignature,
+    bookShow
+  );
+  // router.post(
+  //   "/sendPaymentSuccessEmail",
+  //   auth,
+  //   isViewer,
+  //   sendPaymentSuccessEmail
+  // );
+
+  return router;
+};
