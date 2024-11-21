@@ -16,6 +16,7 @@ app.use(
   cors({
     origin: "http://localhost:3000",
     methods: ["GET", "POST", "PUT", "DELETE"],
+    credentials: true, // Allow cookies or headers like Authorization
   })
 );
 app.use(express.json());
@@ -33,6 +34,7 @@ const io = new Server(server, {
   cors: {
     origin: "http://localhost:3000",
     methods: ["GET", "POST", "PUT", "DELETE"],
+    credentials: true, // Allow cookies or headers like Authorization
   },
 });
 
