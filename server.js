@@ -36,6 +36,7 @@ const io = new Server(server, {
     methods: ["GET", "POST", "PUT", "DELETE"],
     credentials: true, // Allow cookies or headers like Authorization
   },
+  transports: ["polling"], // Fallback to polling
 });
 
 // connections
