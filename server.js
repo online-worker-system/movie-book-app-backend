@@ -46,6 +46,7 @@ const cinemaRoutes = require("./routes/cinemaRoute");
 const movieRoutes = require("./routes/movieRoute");
 const showRoutes = require("./routes/showRoute")(io);
 const paymentRoutes = require("./routes/paymentRoute");
+const bookingRoutes = require("./routes/bookingRoute");
 
 // route handlers
 app.use("/api/v1/auth", userRoutes);
@@ -53,6 +54,7 @@ app.use("/api/v1/cinema", cinemaRoutes);
 app.use("/api/v1/movie", movieRoutes);
 app.use("/api/v1/show", showRoutes);
 app.use("/api/v1/payment", paymentRoutes);
+app.use("/api/v1/booking", bookingRoutes);
 
 // default route
 app.get("/", (req, res) => {
