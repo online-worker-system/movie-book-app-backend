@@ -33,7 +33,7 @@ exports.capturePayment = async (req, res) => {
       seatsBook.map(async (seatId) => {
         const findSeat = await ShowSeat.findById(seatId).populate("seatId"); // Use .lean() for plain objects
 
-        if (findSeat.status !== "FREE" && findSeat.status !== "Available") {
+        if (findSeat.status !== "Reserved") {
           return res.status(400).json({
             success: false,
             message: "Seat is already booked recently!",
@@ -106,6 +106,8 @@ exports.verifySignature = async (req, res, next) => {
     totalAmount,
   } = req.body;
 
+  const io = req.io; // Get io from req (attached in middleware/router)
+
   const body = razorpay_order_id + "|" + razorpay_payment_id;
   const expectedSignature = crypto
     .createHmac("sha256", process.env.RAZORPAY_SECRET)
@@ -130,18 +132,35 @@ exports.verifySignature = async (req, res, next) => {
       });
     }
 
-    // 2. Iterate over the seatsForBook and update status for each ShowSeat
-    for (let seatId of seatsForBook) {
-      const seat = await ShowSeat.findById(seatId);
-      if (!seat) {
-        console.log(`Seat with ID ${seatId} not found`);
-        continue; // Skip to the next seat if the current one is not found
-      }
+    // // 2. Iterate over the seatsForBook and update status for each ShowSeat
+    // for (let seatId of seatsForBook) {
+    //   const seat = await ShowSeat.findById(seatId);
+    //   if (!seat) {
+    //     console.log(`Seat with ID ${seatId} not found`);
+    //     continue; // Skip to the next seat if the current one is not found
+    //   }
 
-      // Update the seat's status to "BOOKED"
-      seat.status = "Booked";
-      await seat.save();
+    //   // Update the seat's status to "BOOKED"
+    //   seat.status = "Booked";
+    //   await seat.save();
+    // }
+
+    // Mark the seats as Booked
+    const result = await ShowSeat.updateMany(
+      { _id: { $in: seatsForBook }, status: "Reserved" },
+      { $set: { status: "Booked", reservedAt: null } }
+    );
+    console.log("book res: ", result);
+
+    if (result.modifiedCount === 0) {
+      return res.status(400).json({
+        success: false,
+        message: "Seats are not reserved or already booked.",
+      });
     }
+
+    // Emit event to notify clients about the updated seats
+    io.emit("seatsUpdated", seatsForBook);
 
     next();
   } catch (err) {

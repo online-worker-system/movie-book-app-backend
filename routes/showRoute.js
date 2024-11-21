@@ -10,8 +10,6 @@ const {
 } = require("../controllers/Show");
 const { auth, isAdmin, isViewer } = require("../middlewares/auth");
 
-module.exports = router;
-
 module.exports = (io) => {
   router.post("/addShow", auth, isAdmin, addShow);
   router.post("/liveYourShow", auth, isAdmin, doLiveShow);
@@ -25,3 +23,6 @@ module.exports = (io) => {
 
   return router;
 };
+
+
+

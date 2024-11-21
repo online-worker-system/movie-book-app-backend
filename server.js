@@ -48,7 +48,7 @@ const userRoutes = require("./routes/userRoute");
 const cinemaRoutes = require("./routes/cinemaRoute");
 const movieRoutes = require("./routes/movieRoute");
 const showRoutes = require("./routes/showRoute")(io);
-const paymentRoutes = require("./routes/paymentRoute");
+const paymentRoutes = require("./routes/paymentRoute")(io);
 const bookingRoutes = require("./routes/bookingRoute");
 
 // route handlers
