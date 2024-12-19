@@ -52,8 +52,11 @@ exports.addShow = async (req, res) => {
 
       if (
         valueShowTiming === timing &&
-        (valueShowStart.getTime() === inputShowStart.getTime() ||
-          valueShowEnd.getTime() === inputShowEnd.getTime())
+        (
+          (inputShowStart >= valueShowStart && inputShowStart <= valueShowEnd) || // Input start is within an existing show's range
+          (inputShowEnd >= valueShowStart && inputShowEnd <= valueShowEnd) ||    // Input end is within an existing show's range
+          (inputShowStart <= valueShowStart && inputShowEnd >= valueShowEnd)    // Input range completely overlaps an existing show
+        )
       ) {
         isExist = true;
       }
