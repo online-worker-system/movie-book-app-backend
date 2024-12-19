@@ -140,12 +140,16 @@ exports.addMovie = async (req, res) => {
       releaseDate,
       summary,
       genres,
-      castMembers,
+      cast,
+      crew,
       supportingLanguages,
+      thumbnail,
+      banner,
     } = req.body;
 
     // get thumbnail image
-    const thumbnail = req.files.thumbnailImage;
+    // const thumbnail = req.files.thumbnailImage;
+    // const banner = req.files.thumbnailImage;
 
     // validation
     if (
@@ -153,9 +157,11 @@ exports.addMovie = async (req, res) => {
       !releaseDate ||
       !summary ||
       !genres ||
-      !castMembers ||
+      !cast ||
+      !crew ||
       !supportingLanguages ||
-      !thumbnail
+      !thumbnail ||
+      !banner
     ) {
       return res.status(400).json({
         success: false,
@@ -163,11 +169,11 @@ exports.addMovie = async (req, res) => {
       });
     }
 
-    // upload image to cloudinary
-    const thumbnailUpload = await uploadFileToCloudinary(
-      thumbnail,
-      process.env.FOLDER_IMAGE
-    );
+    // // upload image to cloudinary
+    // const thumbnailUpload = await uploadFileToCloudinary(
+    //   thumbnail,
+    //   process.env.FOLDER_IMAGE
+    // );
 
     // create an entry for new course
     const newMovie = await Movie.create({
@@ -175,9 +181,11 @@ exports.addMovie = async (req, res) => {
       releaseDate,
       summary,
       genres,
-      castMembers,
+      cast,
+      crew,
       supportingLanguages,
-      thumbnail: thumbnailUpload?.secure_url,
+      thumbnail,
+      banner,
     });
 
     return res.status(200).json({
@@ -209,15 +217,15 @@ exports.updateMovie = async (req, res) => {
       });
     }
 
-    // If Thumbnail Image is found, update it
-    if (req.files) {
-      const thumbnail = req.files.thumbnailImage;
-      const thumbnailImage = await uploadFileToCloudinary(
-        thumbnail,
-        process.env.FOLDER_IMAGE
-      );
-      movie.thumbnail = thumbnailImage.secure_url;
-    }
+    // // If Thumbnail Image is found, update it
+    // if (req.files) {
+    //   const thumbnail = req.files.thumbnailImage;
+    //   const thumbnailImage = await uploadFileToCloudinary(
+    //     thumbnail,
+    //     process.env.FOLDER_IMAGE
+    //   );
+    //   movie.thumbnail = thumbnailImage.secure_url;
+    // }
 
     // Update only the fields that are present in the request body
     for (const key in updates) {

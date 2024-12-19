@@ -71,6 +71,7 @@ exports.addShow = async (req, res) => {
       cinemaId,
       showStart,
       showEnd,
+      adminId,
       isLive: false,
       timing,
       screenId,
