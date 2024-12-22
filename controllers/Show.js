@@ -159,7 +159,7 @@ exports.getUnliveShows = async (req, res) => {
     const findShows = await MovieShow.find({
       adminId: adminId,
       isLive: false,
-    });
+    }).populate("cinemaId").populate("movieId");
 
     if (!findShows || findShows.isLive) {
       return res.status(404).json({
