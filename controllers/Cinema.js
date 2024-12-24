@@ -66,7 +66,7 @@ exports.findCinemaDetailes = async (req, res) => {
 
     const findCinema = await Cinema.find({
       adminDetailes: adminId,
-    });
+    }).populate("cityId");
 
     if (!findCinema) {
       return res.status(404).json({
