@@ -7,6 +7,7 @@ require("dotenv").config();
 const dbConnect = require("./config/database");
 const { cloudinaryConnect } = require("./config/cloudinary");
 const PORT = process.env.PORT || 5000;
+const isProduction = process.env.NODE_ENV === "production";
 
 const http = require("http");
 const { Server } = require("socket.io");
@@ -14,7 +15,9 @@ const { Server } = require("socket.io");
 // middleware setup
 app.use(
   cors({
-    origin: "http://localhost:3000",
+    origin: isProduction
+      ? "https://book-my-cinema.vercel.app"
+      : "http://localhost:3000",
     methods: ["GET", "POST", "PUT", "DELETE"],
     credentials: true, // Allow cookies or headers like Authorization
   })
@@ -32,7 +35,9 @@ app.use(
 const server = http.createServer(app);
 const io = new Server(server, {
   cors: {
-    origin: "http://localhost:3000",
+    origin: isProduction
+      ? "https://book-my-cinema.vercel.app"
+      : "http://localhost:3000",
     methods: ["GET", "POST", "PUT", "DELETE"],
     credentials: true, // Allow cookies or headers like Authorization
   },
