@@ -16,7 +16,7 @@ const { Server } = require("socket.io");
 app.use(
   cors({
     origin: isProduction
-      ? "https://book-my-cinema.vercel.app"
+      ? ["https://book-my-cinema.vercel.app", "http://localhost:3000"]
       : "http://localhost:3000",
     methods: ["GET", "POST", "PUT", "DELETE"],
     credentials: true, // Allow cookies or headers like Authorization
@@ -36,7 +36,7 @@ const server = http.createServer(app);
 const io = new Server(server, {
   cors: {
     origin: isProduction
-      ? "https://book-my-cinema.vercel.app"
+      ? ["https://book-my-cinema.vercel.app", "http://localhost:3000"]
       : "http://localhost:3000",
     methods: ["GET", "POST", "PUT", "DELETE"],
     credentials: true, // Allow cookies or headers like Authorization
@@ -74,9 +74,9 @@ app.get("/", (req, res) => {
 
 // Socket.IO connection handling
 io.on("connection", (socket) => {
-  console.log("A user connected:", socket.id);
+  // console.log("A user connected:", socket.id);
   socket.on("disconnect", () => {
-    console.log("A user disconnected:", socket.id);
+    // console.log("A user disconnected:", socket.id);
   });
 });
 

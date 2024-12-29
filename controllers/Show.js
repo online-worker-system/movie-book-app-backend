@@ -52,11 +52,9 @@ exports.addShow = async (req, res) => {
 
       if (
         valueShowTiming === timing &&
-        (
-          (inputShowStart >= valueShowStart && inputShowStart <= valueShowEnd) || // Input start is within an existing show's range
-          (inputShowEnd >= valueShowStart && inputShowEnd <= valueShowEnd) ||    // Input end is within an existing show's range
-          (inputShowStart <= valueShowStart && inputShowEnd >= valueShowEnd)    // Input range completely overlaps an existing show
-        )
+        ((inputShowStart >= valueShowStart && inputShowStart <= valueShowEnd) || // Input start is within an existing show's range
+          (inputShowEnd >= valueShowStart && inputShowEnd <= valueShowEnd) || // Input end is within an existing show's range
+          (inputShowStart <= valueShowStart && inputShowEnd >= valueShowEnd)) // Input range completely overlaps an existing show
       ) {
         isExist = true;
       }
@@ -159,7 +157,9 @@ exports.getUnliveShows = async (req, res) => {
     const findShows = await MovieShow.find({
       adminId: adminId,
       isLive: false,
-    }).populate("cinemaId").populate("movieId");
+    })
+      .populate("cinemaId")
+      .populate("movieId");
 
     if (!findShows || findShows.isLive) {
       return res.status(404).json({
@@ -204,7 +204,6 @@ exports.reserveSeats = async (req, res, io) => {
       { _id: { $in: seatIds }, status: "Available" },
       { $set: { status: "Reserved", reservedAt: new Date() } }
     );
-    // console.log("reserved res: ", result);
 
     if (result.modifiedCount === 0) {
       return res.status(400).json({
@@ -225,7 +224,6 @@ exports.reserveSeats = async (req, res, io) => {
           status: "Reserved",
           reservedAt: { $lte: expiryTime },
         });
-        console.log("seatsToRevert: ", seatsToRevert);
 
         // If there are seats to revert, change their status to Available
         if (seatsToRevert.length > 0) {
@@ -238,11 +236,11 @@ exports.reserveSeats = async (req, res, io) => {
             },
             { $set: { status: "Available", reservedAt: null } }
           );
-          console.log(`Reverted seats ${seatIds} to Available`);
+
           io.emit("seatsToRevert", revertIds);
         }
       } catch (error) {
-        console.error("Error reverting reserved seats:", error.message);
+        // console.error("Error reverting reserved seats:", error.message);
       }
     }, 1 * 60 * 1000); // 5 minutes in milliseconds
 
@@ -255,7 +253,6 @@ exports.reserveSeats = async (req, res, io) => {
         "Seats reserved successfully. They will be reverted if not booked within 5 minutes.",
     });
   } catch (error) {
-    console.error("Error reserving seats:", error.message);
     res.status(500).json({
       success: false,
       message: "Server error while reserving seats.",
@@ -273,7 +270,6 @@ exports.bookSeats = async (req, res, io) => {
       { _id: { $in: seatIds }, status: "Reserved" },
       { $set: { status: "Booked", reservedAt: null } }
     );
-    console.log("book res: ", result);
 
     if (result.modifiedCount === 0) {
       return res.status(400).json({
@@ -290,7 +286,6 @@ exports.bookSeats = async (req, res, io) => {
       message: "Seats booked successfully.",
     });
   } catch (error) {
-    console.error("Error booking seats:", error.message);
     res.status(500).json({
       success: false,
       message: "Server error while booking seats.",

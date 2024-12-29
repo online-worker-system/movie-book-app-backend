@@ -55,7 +55,6 @@ exports.bookShow = async (req, res) => {
       message: "Booking confirmed",
     });
   } catch (error) {
-    console.log("Something went wrong while booking show");
     return res.status(500).json({
       success: false,
       error: error.message,
