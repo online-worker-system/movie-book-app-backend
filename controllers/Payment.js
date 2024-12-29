@@ -14,14 +14,10 @@ const MovieShow = require("../models/MovieShow");
 exports.capturePayment = async (req, res) => {
   try {
     const { showId, movieId, cinemaId, screenId, seatsBook } = req.body;
-
     const userId = req.user.id;
-
-    console.log("idhar aayaya");
 
     // Validate booking ID
     const show = await Show.findById(showId).populate("showSeats");
-
     if (!show) {
       return res.status(404).json({
         success: false,
@@ -32,7 +28,6 @@ exports.capturePayment = async (req, res) => {
     const findSeats = await Promise.all(
       seatsBook.map(async (seatId) => {
         const findSeat = await ShowSeat.findById(seatId).populate("seatId"); // Use .lean() for plain objects
-
         if (findSeat.status !== "Reserved") {
           return res.status(400).json({
             success: false,
@@ -42,8 +37,6 @@ exports.capturePayment = async (req, res) => {
         return findSeat;
       })
     );
-
-    console.log("Found Seats:", findSeats);
 
     // Initialize amount to 0
     let amount = 0;
@@ -55,10 +48,7 @@ exports.capturePayment = async (req, res) => {
         typeof seat.seatId.seatPrice === "number" &&
         !isNaN(seat.seatId.seatPrice)
       ) {
-        console.log("Price of seat:", seat.seatId.seatPrice);
-        amount += seat.seatId.seatPrice; // Adding price if it's valid
-      } else {
-        console.log("Invalid price for seat:", seat);
+        amount += seat.seatId.seatPrice;
       }
     });
 
@@ -125,7 +115,6 @@ exports.verifySignature = async (req, res, next) => {
     // Update booking and create transaction
     const movieShow = await MovieShow.findById(showId);
     if (!movieShow) {
-      console.log("Movie show not found");
       return res.status(401).json({
         success: false,
         message: "movie not found",
@@ -150,7 +139,6 @@ exports.verifySignature = async (req, res, next) => {
       { _id: { $in: seatsForBook }, status: "Reserved" },
       { $set: { status: "Booked", reservedAt: null } }
     );
-    console.log("book res: ", result);
 
     if (result.modifiedCount === 0) {
       return res.status(400).json({
