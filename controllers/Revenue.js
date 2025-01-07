@@ -38,13 +38,8 @@ exports.getAdminRevenueDetails = async (req, res) => {
           });
         }
 
-        const details = Object.keys(movieRevenue).map((movieId) => ({
-          movieId,
-          revenue: movieRevenue[movieId],
-        }));
-
-        const totalRevenue = details.reduce(
-          (acc, curr) => acc + curr.revenue,
+        const totalRevenue = Object.values(movieRevenue).reduce(
+          (acc, curr) => acc + curr,
           0
         );
 
@@ -52,7 +47,6 @@ exports.getAdminRevenueDetails = async (req, res) => {
           cinemaId: cinema._id,
           cinemaName: cinema.cinemaName,
           totalRevenue,
-          details,
         };
       })
     );
@@ -83,54 +77,38 @@ exports.getRevenueDetailsByCity = async (req, res) => {
           "screens"
         );
 
-        const cinemaDetails = await Promise.all(
-          cinemas.map(async (cinema) => {
-            const shows = await MovieShow.find({
-              cinemaId: cinema._id,
-              showStart: { $gte: new Date(startDate), $lte: new Date(endDate) },
-            });
+        const cityRevenue = await cinemas.reduce(async (accPromise, cinema) => {
+          const acc = await accPromise;
+          const shows = await MovieShow.find({
+            cinemaId: cinema._id,
+            showStart: { $gte: new Date(startDate), $lte: new Date(endDate) },
+          });
 
-            const movieRevenue = {};
-            for (const show of shows) {
+          const cinemaRevenue = await shows.reduce(
+            async (showAccPromise, show) => {
+              const showAcc = await showAccPromise;
               const bookings = await Booking.find({
                 showId: show._id,
                 status: "BOOKED",
               });
 
-              bookings.forEach((booking) => {
-                if (!movieRevenue[show.movieId]) {
-                  movieRevenue[show.movieId] = 0;
-                }
-                movieRevenue[show.movieId] += booking.totalAmount;
-              });
-            }
+              const showRevenue = bookings.reduce(
+                (bookingAcc, booking) => bookingAcc + booking.totalAmount,
+                0
+              );
 
-            const totalRevenue = Object.values(movieRevenue).reduce(
-              (acc, curr) => acc + curr,
-              0
-            );
+              return showAcc + showRevenue;
+            },
+            Promise.resolve(0)
+          );
 
-            const adminDetails = await User.findById(cinema.adminDetailes);
-
-            return {
-              cinemaId: cinema._id,
-              cinemaName: cinema.cinemaName,
-              totalRevenue,
-              adminDetails,
-            };
-          })
-        );
-
-        const cityRevenue = cinemaDetails.reduce(
-          (acc, curr) => acc + curr.totalRevenue,
-          0
-        );
+          return acc + cinemaRevenue;
+        }, Promise.resolve(0));
 
         return {
           cityId: city._id,
           cityName: city.cityName,
           cityRevenue,
-          cinemas: cinemaDetails,
         };
       })
     );
@@ -158,6 +136,12 @@ exports.getRevenueByCityId = async (req, res) => {
     } = req.body;
 
     const cityData = await City.findById(cityId);
+    if (!cityData) {
+      return res.status(404).json({
+        success: false,
+        message: `Could not find city with id: ${cityId}`,
+      });
+    }
 
     const cinemas = await Cinema.find({ cityId }).populate("screens");
 
@@ -188,7 +172,9 @@ exports.getRevenueByCityId = async (req, res) => {
           0
         );
 
-        const adminDetails = await User.findById(cinema.adminDetailes);
+        const adminDetails = await User.findById(cinema.adminDetailes).select(
+          "-password -booking"
+        );
 
         return {
           cinemaId: cinema._id,
