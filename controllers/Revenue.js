@@ -12,6 +12,16 @@ exports.getAdminRevenueDetails = async (req, res) => {
       endDate = "2024-12-27",
     } = req.body;
 
+    const adminDetails = await User.findById(userId).select(
+      "-password -booking"
+    );
+    if (!adminDetails) {
+      return res.status(404).json({
+        success: false,
+        message: `Could not find admin with id: ${userId}`,
+      });
+    }
+
     const cinemas = await Cinema.find({ adminDetailes: userId }).populate(
       "screens"
     );
@@ -51,9 +61,14 @@ exports.getAdminRevenueDetails = async (req, res) => {
       })
     );
 
+    const finalData = {
+      adminDetails,
+      cinemas: revenueDetails,
+    };
+
     return res.status(200).json({
       success: true,
-      data: revenueDetails,
+      data: finalData,
       message: "Admin-Revenue-Details Fetched Successfully",
     });
   } catch (error) {
