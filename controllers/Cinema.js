@@ -103,11 +103,29 @@ exports.updateScreen = async (req, res) => {
 
     const seatIds = [];
 
+    // Get the last seat number for each seat type
+    const lastRegularSeat = await Seat.find({ seatType: regular.name })
+      .sort({ seatNumber: -1 })
+      .limit(1);
+    const lastBolconySeat = await Seat.find({ seatType: bolcony.name })
+      .sort({ seatNumber: -1 })
+      .limit(1);
+    const lastVipSeat = await Seat.find({ seatType: vip.name })
+      .sort({ seatNumber: -1 })
+      .limit(1);
+
+    const lastRegularSeatNumber =
+      lastRegularSeat.length > 0 ? lastRegularSeat[0].seatNumber : 0;
+    const lastBolconySeatNumber =
+      lastBolconySeat.length > 0 ? lastBolconySeat[0].seatNumber : 0;
+    const lastVipSeatNumber =
+      lastVipSeat.length > 0 ? lastVipSeat[0].seatNumber : 0;
+
     // Create seats for 'regular' category and add their IDs to seatIds
     for (let i = 0; i < regular.seat; i++) {
       const newSeat = await Seat.create({
         seatType: regular.name,
-        seatNumber: i + 1,
+        seatNumber: lastRegularSeatNumber + i + 1,
         seatPrice: regular.price,
       });
       seatIds.push(newSeat._id);
@@ -117,7 +135,7 @@ exports.updateScreen = async (req, res) => {
     for (let i = 0; i < bolcony.seat; i++) {
       const newSeat = await Seat.create({
         seatType: bolcony.name,
-        seatNumber: i + 1,
+        seatNumber: lastBolconySeatNumber + i + 1,
         seatPrice: bolcony.price,
       });
       seatIds.push(newSeat._id);
@@ -127,7 +145,7 @@ exports.updateScreen = async (req, res) => {
     for (let i = 0; i < vip.seat; i++) {
       const newSeat = await Seat.create({
         seatType: vip.name,
-        seatNumber: i + 1,
+        seatNumber: lastVipSeatNumber + i + 1,
         seatPrice: vip.price,
       });
       seatIds.push(newSeat._id);
